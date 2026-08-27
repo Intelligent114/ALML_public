@@ -1,0 +1,78 @@
+name: 作业或实验问题
+description: 询问题意、实验步骤、环境配置、代码框架或 OJ 使用
+title: "[HW/LAB] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提问前请先搜索已有 Issue。不要发布学号、个人邮箱、验证码、密码、Cookie、SHA256 提交值、未公开答案或完整个人作业。
+  - type: dropdown
+    id: material
+    attributes:
+      label: 材料
+      description: 请选择对应的作业或实验。
+      options:
+        - HW0
+        - LAB0
+        - 其他或尚未列出的材料
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: 具体位置
+      description: 例如“HW0 第 3(b) 题”或“LAB0 第 2 节创建环境”。
+      placeholder: LAB0 第 2 节
+    validations:
+      required: true
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: 操作系统
+      options:
+        - Windows
+        - macOS
+        - 与操作系统无关
+    validations:
+      required: true
+  - type: input
+    id: system-version
+    attributes:
+      label: 系统版本与 CPU 架构
+      description: 例如“Windows 11 x86_64”或“macOS 15 Apple Silicon”。纯题意问题可写“不适用”。
+      placeholder: Windows 11 x86_64
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: 问题描述
+      description: 说明预期结果、实际结果和问题发生前的操作。
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: 执行的命令与完整错误
+      description: 环境或代码问题请粘贴可复现命令和完整错误；数学题意问题可写“不适用”。
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: attempts
+    attributes:
+      label: 已尝试的方法
+      description: 列出已经阅读的文档、执行的排错步骤和结果。
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 发布前确认
+      options:
+        - label: 我已经搜索过现有 Issue，没有找到相同问题。
+          required: true
+        - label: 我没有包含学号、个人邮箱、验证码、密码、Cookie 或 SHA256 提交值。
+          required: true
+        - label: 我没有发布未公开答案、完整个人作业或他人的提交。
+          required: true

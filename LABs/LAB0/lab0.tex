@@ -21,6 +21,8 @@
 \definecolor{coursegreen}{HTML}{18794E}
 \definecolor{codered}{HTML}{A13D2D}
 \definecolor{codegray}{HTML}{F4F6F8}
+\definecolor{windowsblue}{HTML}{0067B8}
+\definecolor{macgray}{HTML}{4B5563}
 \hypersetup{colorlinks=true,linkcolor=courseblue,urlcolor=courseblue}
 
 \lstdefinestyle{coursecode}{
@@ -54,6 +56,8 @@
   arc=1.5mm,
   left=1.5mm,right=1.5mm,top=1.2mm,bottom=1.2mm
 }
+\newcommand{\windows}{\subsection*{\textcolor{windowsblue}{Windows}}}
+\newcommand{\macos}{\subsection*{\textcolor{macgray}{macOS}}}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -80,9 +84,10 @@
 \thispagestyle{fancy}
 
 \section*{实验目标与提交要求}
-\thispagestyle{fancy}
 
 本实验帮助大家建立后续实验统一使用的 Python 开发环境。完成后，你应当能够使用 Git 获取课程代码，使用 Conda 管理独立环境，在 Visual Studio Code（VS Code）中选择正确的 Python 解释器，并正常导入 NumPy、scikit-learn 与 PyTorch。
+
+本文分别给出 \textbf{Windows 10/11（64 位）}和 \textbf{macOS 11 或更高版本（Apple Silicon 或 Intel）}的完整操作。请选择自己的平台，按对应步骤从头完成；不要把两个平台的命令混在同一个终端中执行。
 
 \begin{importantbox}
 预计用时为 \textbf{60--90 分钟}。本实验必须单人完成，不要求 GPU，不要求撰写实验报告。最终只需向 OJ 提交验证脚本生成的 \textbf{64 位 SHA256 字符串}。截止前可以重复提交。
@@ -99,78 +104,146 @@ LAB0/
 
 请不要修改 \texttt{verify\_env.py}。如果程序没有生成 SHA256，应根据错误提示修复环境，而不是删除检查代码。
 
+对作业或实验内容有疑问时，请先搜索并通过课程仓库的 GitHub Issues 提问：
+\begin{center}
+  \url{https://github.com/Intelligent114/ALML_public/issues}
+\end{center}
+不要在 Issue 中发布本人学号、邮箱验证码、密码、SHA256 提交值或未公开答案。
+
 \section{安装与配置 Git}
 
-Git 是一个分布式版本控制系统。本课程将使用 Git 发布和更新实验代码。请从 Git 官方网站安装适合自己操作系统的版本：
-\begin{center}
-  \url{https://git-scm.com/downloads}
-\end{center}
+Git 是一个分布式版本控制系统。本课程使用 Git 发布和更新实验代码。
 
-安装完成后，打开终端并检查：
+\windows
+
+打开 Git 官方 Windows 安装页面：
+\begin{center}
+  \url{https://git-scm.com/install/windows}
+\end{center}
+下载并运行适合机器架构的 Git for Windows 安装器，保留默认选项即可。也可以在 PowerShell 中使用 Windows Package Manager：
+
+\begin{lstlisting}[language=bash]
+winget install --id Git.Git -e --source winget
+\end{lstlisting}
+
+安装完成后关闭并重新打开 PowerShell，运行：
 
 \begin{lstlisting}[language=bash]
 git --version
-\end{lstlisting}
-
-第一次使用 Git 时，设置提交中显示的姓名和邮箱：
-
-\begin{lstlisting}[language=bash]
 git config --global user.name "Your Name"
 git config --global user.email "your_email@example.com"
 git config --list --show-origin
 \end{lstlisting}
 
-将课程仓库克隆到本地：
+在 PowerShell 中克隆课程仓库：
 
 \begin{lstlisting}[language=bash]
+cd $HOME
 git clone https://github.com/Intelligent114/ALML_public.git
 cd ALML_public
 git status
 git log -1
 \end{lstlisting}
 
-以后获取课程更新，只需进入已经克隆的仓库并运行：
+\macos
+
+打开 Terminal（终端）。macOS 可以通过 Xcode Command Line Tools 安装 Apple 提供的 Git：
 
 \begin{lstlisting}[language=bash]
-git pull
+xcode-select --install
+\end{lstlisting}
+
+在系统弹窗中选择安装，完成后关闭并重新打开 Terminal，再运行：
+
+\begin{lstlisting}[language=bash]
+git --version
+git config --global user.name "Your Name"
+git config --global user.email "your_email@example.com"
+git config --list --show-origin
+\end{lstlisting}
+
+如果已经使用 Homebrew，也可以运行 \texttt{brew install git}；本实验不要求专门安装 Homebrew。在 Terminal 中克隆课程仓库：
+
+\begin{lstlisting}[language=bash]
+cd "$HOME"
+git clone https://github.com/Intelligent114/ALML_public.git
+cd ALML_public
+git status
+git log -1
 \end{lstlisting}
 
 \begin{tipbox}
-如果 \texttt{git pull} 提示本地修改冲突，请不要盲目覆盖文件。先备份自己的代码，再根据课程公告或向助教询问如何处理。
+Windows 与 macOS 后续获取更新的命令都是 \texttt{git pull}。如果出现本地修改冲突，请先备份自己的文件，再在 GitHub Issues 中说明平台、文件名和完整错误，不要盲目覆盖。
 \end{tipbox}
 
-\section{安装 Conda 并创建课程环境}
+\section{安装 Miniforge 并创建课程环境}
 
-Conda 可以为不同项目创建相互隔离的 Python 环境，避免不同课程所需的软件版本相互冲突。本课程推荐安装体积较小、默认使用 \texttt{conda-forge} 的 Miniforge：
+Conda 可以为不同项目建立相互隔离的 Python 环境。本课程使用由 conda-forge 维护的 Miniforge：
 \begin{center}
-  \url{https://github.com/conda-forge/miniforge}
+  \url{https://github.com/conda-forge/miniforge/releases/latest}
 \end{center}
 
-安装后重新打开终端，运行：
+\windows
+
+下载 \texttt{Miniforge3-Windows-x86\_64.exe} 并运行。建议保留“创建开始菜单快捷方式”，不要勾选把 Miniforge 添加到系统 PATH，以免与其他 Python 冲突。
+
+安装后从开始菜单打开 \textbf{Miniforge Prompt}，执行：
 
 \begin{lstlisting}[language=bash]
 conda --version
-conda info --envs
+conda init powershell
 \end{lstlisting}
 
-如果终端找不到 \texttt{conda}，请按照安装器提示初始化当前 Shell。例如可在 Miniforge Prompt 中执行 \texttt{conda init powershell}，然后关闭并重新打开 PowerShell。不要随意把多个 Python 目录同时加入系统 PATH。
-
-进入 LAB0 目录，按照课程提供的 \texttt{environment.yml} 创建环境：
+关闭所有 Miniforge Prompt 和 PowerShell 窗口，再重新打开 PowerShell。进入 LAB0 目录并创建课程环境：
 
 \begin{lstlisting}[language=bash]
-cd ALML_public/LABs/LAB0
+cd $HOME\ALML_public\LABs\LAB0
 conda env create -f environment.yml
 conda activate ai3002
-\end{lstlisting}
-
-看到命令提示符前出现 \texttt{(ai3002)} 后，检查解释器：
-
-\begin{lstlisting}[language=bash]
 python --version
+where.exe python
 python -c "import sys; print(sys.executable)"
 \end{lstlisting}
 
-本实验使用 Python 3.11。查看、退出或删除环境的常用命令为：
+\macos
+
+在 Apple 菜单的“关于本机”中查看芯片类型，或者在 Terminal 运行：
+
+\begin{lstlisting}[language=bash]
+uname -m
+\end{lstlisting}
+
+根据输出选择安装器：
+\begin{itemize}
+  \item \texttt{arm64}：下载 Apple Silicon 的 \path{Miniforge3-MacOSX-arm64.pkg}；
+  \item \texttt{x86\_64}：下载 Intel 的 \path{Miniforge3-MacOSX-x86_64.pkg}。
+\end{itemize}
+运行签名的 PKG 安装器，并在安装选项中允许初始化当前 Shell。
+
+安装后关闭并重新打开 Terminal，运行：
+
+\begin{lstlisting}[language=bash]
+conda --version
+\end{lstlisting}
+
+如果提示找不到 \texttt{conda}，执行下面的命令，然后再次关闭并重新打开 Terminal：
+
+\begin{lstlisting}[language=bash]
+~/miniforge3/bin/conda init zsh
+\end{lstlisting}
+
+进入 LAB0 目录并创建课程环境：
+
+\begin{lstlisting}[language=bash]
+cd "$HOME/ALML_public/LABs/LAB0"
+conda env create -f environment.yml
+conda activate ai3002
+python --version
+which python
+python -c "import sys; print(sys.executable)"
+\end{lstlisting}
+
+两个平台都应看到 Python 3.11，解释器路径中应包含 \texttt{ai3002}。查看、退出或删除环境的命令在 Windows PowerShell 与 macOS Terminal 中相同：
 
 \begin{lstlisting}[language=bash]
 conda info --envs
@@ -178,84 +251,121 @@ conda deactivate
 conda env remove -n ai3002
 \end{lstlisting}
 
-只有环境安装损坏、且普通排错无法解决时才需要删除重建。后续每次做实验前，都应先运行 \texttt{conda activate ai3002}。
+只有环境已经损坏且普通排错无法解决时才需要删除重建。后续每次做实验前，都应先运行 \texttt{conda activate ai3002}。
 
-\section{在 VS Code 中选择正确解释器}
-\thispagestyle{fancy}
+\section{安装 VS Code 并选择正确解释器}
 
-安装 VS Code：\url{https://code.visualstudio.com/}。打开扩展面板，安装 Microsoft 发布的 \textbf{Python} 扩展，然后用 VS Code 打开整个课程仓库目录，而不是只打开某一个 Python 文件。
+VS Code 下载地址为 \url{https://code.visualstudio.com/}。安装后，在扩展面板安装 Microsoft 发布的 \textbf{Python} 扩展；Python Environments 扩展会协助发现和切换 Conda 环境。
 
-按下 \texttt{Ctrl+Shift+P}（macOS 为 \texttt{Cmd+Shift+P}），依次选择：
+\windows
+
+运行 Windows 安装器时，建议启用“添加到 PATH”和“通过 Code 打开”选项。也可以在 PowerShell 中安装：
+
+\begin{lstlisting}[language=bash]
+winget install -e --id Microsoft.VisualStudioCode
+\end{lstlisting}
+
+重新打开 PowerShell，用 VS Code 打开整个课程仓库：
+
+\begin{lstlisting}[language=bash]
+code $HOME\ALML_public
+\end{lstlisting}
+
+按 \texttt{Ctrl+Shift+P}，选择：
 
 \begin{center}
 \texttt{Python: Select Interpreter} $\longrightarrow$ \texttt{ai3002 (Python 3.11)}
 \end{center}
 
-打开一个新的 VS Code 集成终端，再次运行：
+新建 VS Code 集成终端，确认提示符前有 \texttt{(ai3002)}，然后运行：
 
 \begin{lstlisting}[language=bash]
+where.exe python
 python -c "import sys; print(sys.executable)"
 \end{lstlisting}
 
-输出路径应指向 \texttt{ai3002} 环境。此后 VS Code 的运行按钮、调试器、自动补全和集成终端都会使用这个解释器。
+\macos
+
+下载 macOS 版本，将 Visual Studio Code 拖入 Applications。打开 VS Code，按 \texttt{Cmd+Shift+P}；如需在 Terminal 使用 \texttt{code}，先执行 \texttt{Shell Command: Install 'code' command in PATH}。
+
+在 Terminal 中打开整个课程仓库：
+
+\begin{lstlisting}[language=bash]
+code "$HOME/ALML_public"
+\end{lstlisting}
+
+按 \texttt{Cmd+Shift+P}，选择：
+
+\begin{center}
+\texttt{Python: Select Interpreter} $\longrightarrow$ \texttt{ai3002 (Python 3.11)}
+\end{center}
+
+新建 VS Code 集成终端，确认提示符前有 \texttt{(ai3002)}，然后运行：
+
+\begin{lstlisting}[language=bash]
+which python
+python -c "import sys; print(sys.executable)"
+\end{lstlisting}
 
 \begin{importantbox}
-最常见的安装问题不是“库没有安装”，而是 VS Code 选择了另一个 Python。排错时应首先检查 \texttt{sys.executable}，并使用 \texttt{python -m pip}，不要直接假设 \texttt{pip} 与当前 \texttt{python} 属于同一个环境。
+两个平台最常见的问题都不是“库没有安装”，而是 VS Code 选择了另一个 Python。Windows 用 \texttt{where.exe python}，macOS 用 \texttt{which python}；输出路径必须对应 \texttt{ai3002} 环境。
 \end{importantbox}
 
 \section{检查机器学习库}
 
-\texttt{environment.yml} 会安装以下必需库：
+\texttt{environment.yml} 会安装 NumPy、scikit-learn 与 PyTorch。LAB0 只检查 CPU 整数计算，不要求 CUDA，也不要求 Apple Metal/MPS。
 
-\begin{center}
-\begin{tabular}{lll}
-\toprule
-安装名 & Python 导入名 & 本实验检查内容 \\
-\midrule
-NumPy & \texttt{numpy} & 整数矩阵乘法 \\
-scikit-learn & \texttt{sklearn} & 混淆矩阵 \\
-PyTorch & \texttt{torch} & CPU 整数张量乘法 \\
-\bottomrule
-\end{tabular}
-\end{center}
+\windows
 
-可以先做一次快速导入检查：
+在 VS Code 的 PowerShell 集成终端中运行：
 
 \begin{lstlisting}[language=bash]
+conda activate ai3002
+cd $HOME\ALML_public\LABs\LAB0
 python -c "import numpy, sklearn, torch; print('imports ok')"
+python -c "import torch; print(torch.__version__)"
 \end{lstlisting}
 
-LAB0 不要求 CUDA。\texttt{torch.cuda.is\_available()} 返回 \texttt{False} 不影响实验通过。不要为了本实验单独安装显卡驱动或 CUDA Toolkit。
+\macos
 
-如果校园网络导致安装中断，先重新执行创建环境命令；仍然失败时，请保存完整错误信息、操作系统、\texttt{conda --version} 和 \texttt{python --version}，再向助教求助。不要通过关闭 SSL 校验解决下载问题。
+在 VS Code 的 zsh 集成终端中运行：
+
+\begin{lstlisting}[language=bash]
+conda activate ai3002
+cd "$HOME/ALML_public/LABs/LAB0"
+python -c "import numpy, sklearn, torch; print('imports ok')"
+python -c "import torch; print(torch.__version__)"
+\end{lstlisting}
+
+Windows 没有 NVIDIA GPU 时，\texttt{torch.cuda.is\_available()} 返回 \texttt{False} 是正常的；macOS 通常也会返回 \texttt{False}。这不影响实验通过，不要为了 LAB0 额外安装 CUDA Toolkit 或修改 PyTorch 包。
 
 \section{生成环境验证 SHA256}
 
-在已经激活的 \texttt{ai3002} 环境中，从 VS Code 集成终端运行：
+验证脚本会检查 Python、Conda、Git 和三个机器学习库，并将确定性的整数结果与本人学号组合后计算 SHA256。
+
+\windows
+
+在 VS Code 的 PowerShell 集成终端中运行：
 
 \begin{lstlisting}[language=bash]
+cd $HOME\ALML_public\LABs\LAB0
+conda activate ai3002
 python verify_env.py --self-test
-\end{lstlisting}
-
-\newpage
-自检通过后，使用\textbf{本人学号}运行：
-\thispagestyle{fancy}
-
-\begin{lstlisting}[language=bash]
 python verify_env.py --student-id PBXXXXXXXX
 \end{lstlisting}
 
-验证脚本会依次检查：
+\macos
 
-\begin{enumerate}
-  \item 当前解释器是否为 Python 3.11，且 Conda 环境名为 \texttt{ai3002}；
-  \item Git 是否可用，\texttt{user.name} 与 \texttt{user.email} 是否已配置；
-  \item NumPy、scikit-learn、PyTorch 是否能正常导入；
-  \item 三个库的固定整数计算是否得到预期结果；
-  \item SHA256 协议是否为 \texttt{AI3002-2026F-LAB0-v1}。
-\end{enumerate}
+在 VS Code 的 zsh 集成终端中运行：
 
-正常输出的末尾类似：
+\begin{lstlisting}[language=bash]
+cd "$HOME/ALML_public/LABs/LAB0"
+conda activate ai3002
+python verify_env.py --self-test
+python verify_env.py --student-id PBXXXXXXXX
+\end{lstlisting}
+
+两个平台正常输出的末尾都类似：
 
 \begin{lstlisting}
 [PASS] Student ID: PBXXXXXXXX
@@ -266,50 +376,141 @@ python verify_env.py --student-id PBXXXXXXXX
 0db3...中间省略...7a4c
 \end{lstlisting}
 
-最终 SHA256 只由协议版本、规范化后的学号和固定整数结果组成。软件版本、操作系统、安装路径、GPU 状态和 Git 姓名邮箱均不会上传，也不会影响结果。字母会统一转换成大写，最终 SHA256 为小写。
+最终 SHA256 只由协议版本、规范化后的学号和固定整数结果组成。软件版本、操作系统、安装路径、GPU 状态和 Git 姓名邮箱均不会上传，也不会影响结果。学号字母会统一转换为大写，最终 SHA256 为小写。
 
 \section{提交到 OJ}
 
-登录课程 OJ，打开“LAB0：机器学习开发环境配置”。页面会显示当前账户登记的学号。将验证脚本最后输出的 64 位 SHA256 粘贴到输入框并提交。
+课程 OJ 地址为 \url{https://oj.temaurinum.moe/}。
 
-OJ 会使用\textbf{当前登录账户中的学号}重新计算期望结果，因此：
+\windows
+
+使用 Edge、Chrome 或 Firefox 打开 OJ，登录后选择“LAB0：机器学习开发环境配置”。确认页面显示的学号正确，将 PowerShell 中生成的 64 位 SHA256 粘贴到输入框并提交。
+
+\macos
+
+使用 Safari、Chrome 或 Firefox 打开 OJ，登录后选择“LAB0：机器学习开发环境配置”。确认页面显示的学号正确，将 Terminal 中生成的 64 位 SHA256 粘贴到输入框并提交。
+
+OJ 会使用当前登录账户中的学号重新计算期望结果，因此两个平台都应注意：
 
 \begin{itemize}
   \item 不需要、也不能在 OJ 中另行填写学号；
   \item 复制其他同学的 SHA256 无法通过；
-  \item 如果注册账户时填错学号，应联系助教更正，不要修改验证脚本；
+  \item 如果注册账户时填错学号，请在 GitHub Issue 中只说明“账户学号需要更正”，不要公开具体学号；
   \item 截止前可以重复提交，以出现“环境验证通过”为完成标志。
 \end{itemize}
 
 \begin{importantbox}
-SHA256 是本实验的完成凭证，用于发现常见环境配置错误；它不是可信硬件证明。请独立完成安装过程，因为后续所有正式实验都会直接依赖这个环境。
+SHA256 是本实验的完成凭证，用于发现常见环境配置错误；它不是可信硬件证明。请独立完成安装过程，因为后续正式实验会直接依赖这个环境。
 \end{importantbox}
 
-\section{常见问题}
+\section{通过 GitHub Issues 提问}
 
-\subsection*{终端显示的环境不是 ai3002}
+所有作业与实验问题统一发布到：
+\begin{center}
+  \url{https://github.com/Intelligent114/ALML_public/issues/new/choose}
+\end{center}
 
-先运行 \texttt{conda activate ai3002}。如果 VS Code 终端仍未切换，请重新选择 Python 解释器，然后关闭旧终端并新建终端。
+\windows
 
-\subsection*{找不到 git 或 conda}
+可以在浏览器中打开上面的地址，或在 PowerShell 中运行：
 
-关闭所有终端后重新打开。Windows 用户可以先在 Git Bash 或 Miniforge Prompt 中检查安装，再执行对应的 Shell 初始化。不要从不明来源下载可执行文件。
+\begin{lstlisting}[language=bash]
+start https://github.com/Intelligent114/ALML_public/issues/new/choose
+\end{lstlisting}
+
+\macos
+
+可以在浏览器中打开上面的地址，或在 Terminal 中运行：
+
+\begin{lstlisting}[language=bash]
+open https://github.com/Intelligent114/ALML_public/issues/new/choose
+\end{lstlisting}
+
+提问前先搜索是否已有相同问题。新 Issue 应写明 HW/LAB 编号、Windows 或 macOS、系统版本、CPU 架构、执行的命令、完整错误文本和已经尝试的方法。请使用文字或代码块粘贴错误，避免只发一张无法搜索的截图。
+
+\begin{importantbox}
+GitHub Issue 是公开页面。不得发布真实学号、个人邮箱、验证码、密码、Cookie、SHA256 提交值、未公开答案或完整个人作业。需要私下处理的账户信息由助教在 Issue 中另行说明安全渠道。
+\end{importantbox}
+
+\section{常见问题与双平台排错}
+
+\subsection*{找不到 git}
+
+\windows
+关闭并重新打开 PowerShell，运行 \texttt{where.exe git}。如果仍找不到，重新运行 Git for Windows 安装器，或执行 \texttt{winget install --id Git.Git -e --source winget}。
+
+\macos
+在 Terminal 运行 \texttt{xcode-select --install}，完成系统弹窗中的安装后重新打开 Terminal，再运行 \texttt{which git}。
+
+\subsection*{找不到 conda}
+
+\windows
+从开始菜单打开 Miniforge Prompt，运行 \texttt{conda init powershell}，然后关闭所有终端并重新打开 PowerShell。
+
+\macos
+在 Terminal 运行 \texttt{~/miniforge3/bin/conda init zsh}，然后关闭并重新打开 Terminal。若 Miniforge 安装在其他目录，请在 GitHub Issue 中附上安装路径和 \texttt{ls \$HOME} 的相关输出，不要公开用户名目录中的私人文件。
+
+\subsection*{VS Code 没有使用 ai3002}
+
+\windows
+按 \texttt{Ctrl+Shift+P} 重新运行 \texttt{Python: Select Interpreter}，选择 ai3002；关闭旧集成终端并新建终端，用 \texttt{where.exe python} 核对。
+
+\macos
+按 \texttt{Cmd+Shift+P} 重新运行 \texttt{Python: Select Interpreter}，选择 ai3002；关闭旧集成终端并新建终端，用 \texttt{which python} 核对。
 
 \subsection*{可以导入 NumPy，但不能导入 sklearn 或 torch}
 
-先检查 \texttt{sys.executable}。如果解释器正确，可在 LAB0 目录重新执行：
+\windows
 
 \begin{lstlisting}[language=bash]
+cd $HOME\ALML_public\LABs\LAB0
+conda activate ai3002
 conda env update -n ai3002 -f environment.yml --prune
 \end{lstlisting}
 
-\subsection*{CUDA available 显示 False}
+\macos
 
-这是正常情况。本实验和课程的基础实验均应能在 CPU 环境完成，除非后续实验文档明确说明需要 GPU。
+\begin{lstlisting}[language=bash]
+cd "$HOME/ALML_public/LABs/LAB0"
+conda activate ai3002
+conda env update -n ai3002 -f environment.yml --prune
+\end{lstlisting}
 
 \subsection*{OJ 提示 SHA256 不匹配}
 
-确认使用的是当前课程仓库中的 \texttt{verify\_env.py}，协议显示为 \texttt{AI3002-2026F-LAB0-v1}，输入的是当前 OJ 账户对应的本人学号，并且程序中的所有检查均显示 \texttt{PASS}。
+\windows
+在 PowerShell 中先运行 \texttt{git pull}，再运行 \texttt{python verify\_env.py --self-test} 和本人学号命令；确认所有检查均为 PASS。
+
+\macos
+在 Terminal 中先运行 \texttt{git pull}，再运行 \texttt{python verify\_env.py --self-test} 和本人学号命令；确认所有检查均为 PASS。
+
+如果仍未解决，请按上一节要求创建 GitHub Issue，但不要粘贴最终 SHA256 或本人学号。
+
+\section{完成前自检清单}
+
+提交前逐项核对；若某一项失败，先回到对应章节排查，再创建 GitHub Issue。
+
+\windows
+
+\begin{enumerate}
+  \item \texttt{git --version} 和 \texttt{where.exe git} 均能正常输出；
+  \item \texttt{conda info --envs} 中 ai3002 前有星号，\texttt{where.exe python} 的第一项属于 ai3002；
+  \item 在仓库的 \path{LABs/LAB0} 目录运行库版本检查时，NumPy、scikit-learn 和 PyTorch 均能导入；
+  \item \texttt{python verify\_env.py --self-test} 的全部检查均为 PASS；
+  \item 使用本人学号生成 SHA256，且 OJ 显示“环境验证通过”。
+\end{enumerate}
+
+\macos
+
+\begin{enumerate}
+  \item \texttt{git --version} 和 \texttt{which git} 均能正常输出；
+  \item \texttt{conda info --envs} 中 ai3002 前有星号，\texttt{which python} 指向 ai3002；
+  \item 在仓库的 \path{LABs/LAB0} 目录运行库版本检查时，NumPy、scikit-learn 和 PyTorch 均能导入；
+  \item \texttt{python verify\_env.py --self-test} 的全部检查均为 PASS；
+  \item 使用本人学号生成 SHA256，且 OJ 显示“环境验证通过”。
+\end{enumerate}
+
+完成以上步骤后，请保留本地 ai3002 环境和课程仓库。后续实验只需进入仓库、执行 \texttt{git pull}、激活 ai3002，并在 VS Code 中确认解释器仍为该环境。
 
 \vfill
 \begin{center}

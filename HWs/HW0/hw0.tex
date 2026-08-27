@@ -5,6 +5,7 @@
 \usepackage{enumitem}
 \usepackage{geometry}
 \usepackage{fancyhdr}
+\usepackage{hyperref}
 \usepackage{xcolor}
 
 \geometry{left=2.2cm,right=2.2cm,top=2.1cm,bottom=2.1cm}
@@ -19,6 +20,7 @@
 \newcommand{\Cov}{\operatorname{Cov}}
 \newcommand{\grad}{\nabla}
 \newcommand{\points}[1]{\hfill\textcolor{gray}{[#1 分]}}
+\hypersetup{colorlinks=true,urlcolor=blue!65!black}
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -52,12 +54,18 @@
 
 本作业满分 100 分，最终只记录完成状态，不计入正式书面作业平均分。
 
+如对题意、提交格式或数学符号有疑问，请先搜索并通过课程仓库的 GitHub Issues 提问：
+\begin{center}
+    \url{https://github.com/Intelligent114/ALML_public/issues/new/choose}
+\end{center}
+提问时注明 HW0 和具体题号；不要在公开 Issue 中发布本人学号、个人邮箱或完整作业答案。
+
 提交一个 PDF 文件，命名为：
 \[
     \texttt{学号-姓名-HW0.pdf}.
 \]
 
-\section{向量与矩阵\points{20}}
+\section{向量与矩阵\texorpdfstring{\points{20}}{（20 分）}}
 
 设数据矩阵 $X\in\R^{n\times d}$，参数向量 $\bm w\in\R^d$，标签向量 $\bm y\in\R^n$，并定义预测向量
 \[
@@ -86,7 +94,7 @@
     根据结果说明两向量是否正交。\points{6}
 \end{enumerate}
 
-\section{特征值与二次型\points{15}}
+\section{特征值与二次型\texorpdfstring{\points{15}}{（15 分）}}
 
 给定对称矩阵
 \[
@@ -109,7 +117,7 @@
     的 $\bm x$。\points{2}
 \end{enumerate}
 
-\section{多元微积分与链式法则\points{25}}
+\section{多元微积分与链式法则\texorpdfstring{\points{25}}{（25 分）}}
 
 设 $W\in\R^{m\times d}$、$\bm x\in\R^d$、$\bm b,\bm y\in\R^m$，定义
 \[
@@ -136,7 +144,7 @@
     \points{4}
 \end{enumerate}
 
-\section{概率与统计\points{25}}
+\section{概率与统计\texorpdfstring{\points{25}}{（25 分）}}
 
 \begin{enumerate}
     \item 某事件 $D$ 的先验概率为 $P(D)=0.1$。一个检测方法满足
@@ -163,7 +171,7 @@
     如果你认为不正确，请给出一个简单反例。\points{6}
 \end{enumerate}
 
-\section{梯度下降\points{15}}
+\section{梯度下降\texorpdfstring{\points{15}}{（15 分）}}
 
 考虑函数
 \[
