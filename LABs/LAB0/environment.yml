@@ -1,0 +1,12 @@
+name: ai3002
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - pip
+  - "numpy>=1.26,<3"
+  - "scikit-learn>=1.4,<2"
+  - pip:
+      - "torch>=2.2,<3"

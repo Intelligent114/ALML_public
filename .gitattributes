@@ -1,0 +1,5 @@
+*.md text eol=lf
+*.py text eol=lf
+*.tex text eol=lf
+*.yml text eol=lf
+*.pdf binary

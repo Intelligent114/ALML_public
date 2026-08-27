@@ -1,0 +1,319 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[UTF8]{ctex}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+
+\geometry{left=2.15cm,right=2.15cm,top=2.05cm,bottom=2.05cm}
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.28em}
+\setlist[itemize]{leftmargin=2em,itemsep=0.25em,topsep=0.3em}
+\setlist[enumerate]{leftmargin=2.25em,itemsep=0.25em,topsep=0.3em}
+
+\definecolor{courseblue}{HTML}{2457A6}
+\definecolor{coursegreen}{HTML}{18794E}
+\definecolor{codered}{HTML}{A13D2D}
+\definecolor{codegray}{HTML}{F4F6F8}
+\hypersetup{colorlinks=true,linkcolor=courseblue,urlcolor=courseblue}
+
+\lstdefinestyle{coursecode}{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codegray},
+  frame=single,
+  rulecolor=\color{black!12},
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  keywordstyle=\color{courseblue}\bfseries,
+  commentstyle=\color{coursegreen},
+  stringstyle=\color{codered},
+  aboveskip=0.55em,
+  belowskip=0.55em
+}
+\lstset{style=coursecode}
+
+\newtcolorbox{importantbox}{
+  colback=courseblue!4,
+  colframe=courseblue!65,
+  boxrule=0.7pt,
+  arc=1.5mm,
+  left=1.5mm,right=1.5mm,top=1.2mm,bottom=1.2mm
+}
+\newtcolorbox{tipbox}{
+  colback=coursegreen!4,
+  colframe=coursegreen!65,
+  boxrule=0.7pt,
+  arc=1.5mm,
+  left=1.5mm,right=1.5mm,top=1.2mm,bottom=1.2mm
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{AI3002 人工智能与机器学习基础}
+\rhead{LAB0：开发环境配置}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \lhead{AI3002 人工智能与机器学习基础}%
+  \rhead{LAB0：开发环境配置}%
+  \cfoot{\thepage}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+}
+
+\title{\vspace{-1.35cm}\textbf{人工智能与机器学习基础\\LAB0：机器学习开发环境配置}}
+\author{中国科学技术大学}
+\date{2026 年秋季学期\quad 发布日期与截止日期待定}
+
+\begin{document}
+
+\maketitle
+\pagestyle{fancy}
+\thispagestyle{fancy}
+
+\section*{实验目标与提交要求}
+\thispagestyle{fancy}
+
+本实验帮助大家建立后续实验统一使用的 Python 开发环境。完成后，你应当能够使用 Git 获取课程代码，使用 Conda 管理独立环境，在 Visual Studio Code（VS Code）中选择正确的 Python 解释器，并正常导入 NumPy、scikit-learn 与 PyTorch。
+
+\begin{importantbox}
+预计用时为 \textbf{60--90 分钟}。本实验必须单人完成，不要求 GPU，不要求撰写实验报告。最终只需向 OJ 提交验证脚本生成的 \textbf{64 位 SHA256 字符串}。截止前可以重复提交。
+\end{importantbox}
+
+实验文件目录如下：
+
+\begin{lstlisting}
+LAB0/
+|-- environment.yml
+|-- lab0.pdf
+`-- verify_env.py
+\end{lstlisting}
+
+请不要修改 \texttt{verify\_env.py}。如果程序没有生成 SHA256，应根据错误提示修复环境，而不是删除检查代码。
+
+\section{安装与配置 Git}
+
+Git 是一个分布式版本控制系统。本课程将使用 Git 发布和更新实验代码。请从 Git 官方网站安装适合自己操作系统的版本：
+\begin{center}
+  \url{https://git-scm.com/downloads}
+\end{center}
+
+安装完成后，打开终端并检查：
+
+\begin{lstlisting}[language=bash]
+git --version
+\end{lstlisting}
+
+第一次使用 Git 时，设置提交中显示的姓名和邮箱：
+
+\begin{lstlisting}[language=bash]
+git config --global user.name "Your Name"
+git config --global user.email "your_email@example.com"
+git config --list --show-origin
+\end{lstlisting}
+
+将课程仓库克隆到本地：
+
+\begin{lstlisting}[language=bash]
+git clone https://github.com/Intelligent114/ALML_public.git
+cd ALML_public
+git status
+git log -1
+\end{lstlisting}
+
+以后获取课程更新，只需进入已经克隆的仓库并运行：
+
+\begin{lstlisting}[language=bash]
+git pull
+\end{lstlisting}
+
+\begin{tipbox}
+如果 \texttt{git pull} 提示本地修改冲突，请不要盲目覆盖文件。先备份自己的代码，再根据课程公告或向助教询问如何处理。
+\end{tipbox}
+
+\section{安装 Conda 并创建课程环境}
+
+Conda 可以为不同项目创建相互隔离的 Python 环境，避免不同课程所需的软件版本相互冲突。本课程推荐安装体积较小、默认使用 \texttt{conda-forge} 的 Miniforge：
+\begin{center}
+  \url{https://github.com/conda-forge/miniforge}
+\end{center}
+
+安装后重新打开终端，运行：
+
+\begin{lstlisting}[language=bash]
+conda --version
+conda info --envs
+\end{lstlisting}
+
+如果终端找不到 \texttt{conda}，请按照安装器提示初始化当前 Shell。例如可在 Miniforge Prompt 中执行 \texttt{conda init powershell}，然后关闭并重新打开 PowerShell。不要随意把多个 Python 目录同时加入系统 PATH。
+
+进入 LAB0 目录，按照课程提供的 \texttt{environment.yml} 创建环境：
+
+\begin{lstlisting}[language=bash]
+cd ALML_public/LABs/LAB0
+conda env create -f environment.yml
+conda activate ai3002
+\end{lstlisting}
+
+看到命令提示符前出现 \texttt{(ai3002)} 后，检查解释器：
+
+\begin{lstlisting}[language=bash]
+python --version
+python -c "import sys; print(sys.executable)"
+\end{lstlisting}
+
+本实验使用 Python 3.11。查看、退出或删除环境的常用命令为：
+
+\begin{lstlisting}[language=bash]
+conda info --envs
+conda deactivate
+conda env remove -n ai3002
+\end{lstlisting}
+
+只有环境安装损坏、且普通排错无法解决时才需要删除重建。后续每次做实验前，都应先运行 \texttt{conda activate ai3002}。
+
+\section{在 VS Code 中选择正确解释器}
+\thispagestyle{fancy}
+
+安装 VS Code：\url{https://code.visualstudio.com/}。打开扩展面板，安装 Microsoft 发布的 \textbf{Python} 扩展，然后用 VS Code 打开整个课程仓库目录，而不是只打开某一个 Python 文件。
+
+按下 \texttt{Ctrl+Shift+P}（macOS 为 \texttt{Cmd+Shift+P}），依次选择：
+
+\begin{center}
+\texttt{Python: Select Interpreter} $\longrightarrow$ \texttt{ai3002 (Python 3.11)}
+\end{center}
+
+打开一个新的 VS Code 集成终端，再次运行：
+
+\begin{lstlisting}[language=bash]
+python -c "import sys; print(sys.executable)"
+\end{lstlisting}
+
+输出路径应指向 \texttt{ai3002} 环境。此后 VS Code 的运行按钮、调试器、自动补全和集成终端都会使用这个解释器。
+
+\begin{importantbox}
+最常见的安装问题不是“库没有安装”，而是 VS Code 选择了另一个 Python。排错时应首先检查 \texttt{sys.executable}，并使用 \texttt{python -m pip}，不要直接假设 \texttt{pip} 与当前 \texttt{python} 属于同一个环境。
+\end{importantbox}
+
+\section{检查机器学习库}
+
+\texttt{environment.yml} 会安装以下必需库：
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+安装名 & Python 导入名 & 本实验检查内容 \\
+\midrule
+NumPy & \texttt{numpy} & 整数矩阵乘法 \\
+scikit-learn & \texttt{sklearn} & 混淆矩阵 \\
+PyTorch & \texttt{torch} & CPU 整数张量乘法 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+可以先做一次快速导入检查：
+
+\begin{lstlisting}[language=bash]
+python -c "import numpy, sklearn, torch; print('imports ok')"
+\end{lstlisting}
+
+LAB0 不要求 CUDA。\texttt{torch.cuda.is\_available()} 返回 \texttt{False} 不影响实验通过。不要为了本实验单独安装显卡驱动或 CUDA Toolkit。
+
+如果校园网络导致安装中断，先重新执行创建环境命令；仍然失败时，请保存完整错误信息、操作系统、\texttt{conda --version} 和 \texttt{python --version}，再向助教求助。不要通过关闭 SSL 校验解决下载问题。
+
+\section{生成环境验证 SHA256}
+
+在已经激活的 \texttt{ai3002} 环境中，从 VS Code 集成终端运行：
+
+\begin{lstlisting}[language=bash]
+python verify_env.py --self-test
+\end{lstlisting}
+
+\newpage
+自检通过后，使用\textbf{本人学号}运行：
+\thispagestyle{fancy}
+
+\begin{lstlisting}[language=bash]
+python verify_env.py --student-id PBXXXXXXXX
+\end{lstlisting}
+
+验证脚本会依次检查：
+
+\begin{enumerate}
+  \item 当前解释器是否为 Python 3.11，且 Conda 环境名为 \texttt{ai3002}；
+  \item Git 是否可用，\texttt{user.name} 与 \texttt{user.email} 是否已配置；
+  \item NumPy、scikit-learn、PyTorch 是否能正常导入；
+  \item 三个库的固定整数计算是否得到预期结果；
+  \item SHA256 协议是否为 \texttt{AI3002-2026F-LAB0-v1}。
+\end{enumerate}
+
+正常输出的末尾类似：
+
+\begin{lstlisting}
+[PASS] Student ID: PBXXXXXXXX
+[PASS] Protocol: AI3002-2026F-LAB0-v1
+
+请将下面一行的 64 位字符串提交到 OJ：
+
+0db3...中间省略...7a4c
+\end{lstlisting}
+
+最终 SHA256 只由协议版本、规范化后的学号和固定整数结果组成。软件版本、操作系统、安装路径、GPU 状态和 Git 姓名邮箱均不会上传，也不会影响结果。字母会统一转换成大写，最终 SHA256 为小写。
+
+\section{提交到 OJ}
+
+登录课程 OJ，打开“LAB0：机器学习开发环境配置”。页面会显示当前账户登记的学号。将验证脚本最后输出的 64 位 SHA256 粘贴到输入框并提交。
+
+OJ 会使用\textbf{当前登录账户中的学号}重新计算期望结果，因此：
+
+\begin{itemize}
+  \item 不需要、也不能在 OJ 中另行填写学号；
+  \item 复制其他同学的 SHA256 无法通过；
+  \item 如果注册账户时填错学号，应联系助教更正，不要修改验证脚本；
+  \item 截止前可以重复提交，以出现“环境验证通过”为完成标志。
+\end{itemize}
+
+\begin{importantbox}
+SHA256 是本实验的完成凭证，用于发现常见环境配置错误；它不是可信硬件证明。请独立完成安装过程，因为后续所有正式实验都会直接依赖这个环境。
+\end{importantbox}
+
+\section{常见问题}
+
+\subsection*{终端显示的环境不是 ai3002}
+
+先运行 \texttt{conda activate ai3002}。如果 VS Code 终端仍未切换，请重新选择 Python 解释器，然后关闭旧终端并新建终端。
+
+\subsection*{找不到 git 或 conda}
+
+关闭所有终端后重新打开。Windows 用户可以先在 Git Bash 或 Miniforge Prompt 中检查安装，再执行对应的 Shell 初始化。不要从不明来源下载可执行文件。
+
+\subsection*{可以导入 NumPy，但不能导入 sklearn 或 torch}
+
+先检查 \texttt{sys.executable}。如果解释器正确，可在 LAB0 目录重新执行：
+
+\begin{lstlisting}[language=bash]
+conda env update -n ai3002 -f environment.yml --prune
+\end{lstlisting}
+
+\subsection*{CUDA available 显示 False}
+
+这是正常情况。本实验和课程的基础实验均应能在 CPU 环境完成，除非后续实验文档明确说明需要 GPU。
+
+\subsection*{OJ 提示 SHA256 不匹配}
+
+确认使用的是当前课程仓库中的 \texttt{verify\_env.py}，协议显示为 \texttt{AI3002-2026F-LAB0-v1}，输入的是当前 OJ 账户对应的本人学号，并且程序中的所有检查均显示 \texttt{PASS}。
+
+\vfill
+\begin{center}
+  \textcolor{gray}{--- End of LAB0 ---}
+\end{center}
+
+\end{document}
