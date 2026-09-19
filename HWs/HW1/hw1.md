@@ -1,0 +1,220 @@
+# HW1：线性回归、性能评估与正则化
+
+> 个人完成，预计 4--6 小时，满分 100 分。共五道大题、17个小问。各大题独立，符号、模型与假设均以本题为准。第一题用文字作答；第二至第五题按要求给出计算或推导。题目明确给出的公式可直接使用，无需另证。
+
+允许使用 AI 辅助，但须在文末说明使用方式，并给出至少一项独立核验记录；最终答案应能由本人独立解释。
+
+## 说明与提交要求
+提交一个 PDF 文件，命名为 `学号-姓名-HW1.pdf`。按题号顺序作答，保留必要的推导、计算和文字说明；AI 使用或自检记录附在末尾。通过 [Blackboard 平台（bb.ustc.edu.cn）](https://bb.ustc.edu.cn) 提交，截止时间为 2026 年 10 月 19 日 06:00（北京时间），提交入口以课程通知为准。
+
+如有疑问，请通过课程仓库 Issues 提问，注明 HW1 和题号，不公开个人信息或完整答案。
+
+## 第一题：学习任务与评估方案（12 分，约 20–25 分钟）
+某工厂希望在设备启动前，根据启动前的传感器读数预测本次运行的总耗电量，并将系统用于此前未采集过数据的新设备。现有数据来自同一型号的 60 台设备，每台设备有多次运行记录，记录含设备编号、启动前传感器读数和实际总耗电量。本题只需简要文字说明。
+
+**（1）（4 分）** 判断该任务属于哪类机器学习任务，并写出模型的输入和输出。
+
+**（2）（4 分）** 某同学将全部运行记录随机划分为训练集和测试集。针对“用于新设备”的目标，指出这一划分方式的主要问题，并给出修正办法。
+
+**（3）（4 分）** 判断“加入正则化一定能改善未来新设备上的预测效果”是否成立，并简要说明理由。
+
+## 第二题：不带截距的 Ridge 回归（24 分，约 30–40 分钟）
+$n,d$ 为正整数，$X$ 为特征矩阵，$y$ 为响应向量，$w$ 为系数，维度及预测模型为
+
+$$
+X\in\mathbb R^{n\times d},\qquad y\in\mathbb R^n,\qquad
+w\in\mathbb R^d,\qquad \widehat y=Xw.
+$$
+上标 $\top$ 表示转置，$I_d$ 为单位矩阵，$\mathds{1}_n$ 为长度为 $n$ 的全 $1$ 向量。对实向量 $v$，记
+
+$$
+\|v\|_2^2=v^\top v.
+$$
+对固定的正则化参数 $\lambda>0$，目标函数为
+
+$$
+J_\lambda(w)=\frac1{2n}\|y-Xw\|_2^2+\frac\lambda2\|w\|_2^2.
+$$
+可直接使用：矩阵 $X^\top X+n\lambda I_d$ 可逆，目标函数的最小化解唯一。
+
+**（1）（6 分）** 通过令梯度为零，推导最小化解 $\widehat w_\lambda$ 的显式表达式。保留梯度和线性方程两个中间步骤即可。
+
+**（2）（6 分）** 使用固定步长 $\eta>0$ 的梯度迭代。记迭代次数为 $t$、系数误差为 $e_t$，已知
+
+$$
+\begin{aligned}
+w_{t+1}&=w_t-\eta\nabla J_\lambda(w_t),\qquad t=0,1,2,\ldots,\\
+e_t&=w_t-\widehat w_\lambda,\qquad e_{t+1}=(I_d-\eta H)e_t,\\
+H&=\frac1nX^\top X+\lambda I_d
+=Q\operatorname{diag}(\mu_1,\ldots,\mu_d)Q^\top,\\
+Q^\top Q&=I_d,\qquad \mu_j>0\quad(j=1,\ldots,d).
+\end{aligned}
+$$
+其中 $Q$ 为正交矩阵，$\mu_j$ 为特征值。从已给误差递推式出发，求使所有初值的误差都趋于零的步长范围。无需重新推导误差递推式。
+
+**（3）（6 分）** 令 $c\in\mathbb R$，保持特征矩阵不变，将响应改为
+
+$$
+y'=y+c\mathds{1}_n.
+$$
+记新系数解为 $\widehat w'_\lambda$，推导系数变化量
+
+$$
+\widehat w'_\lambda-\widehat w_\lambda.
+$$
+**（4）（6 分）** 设 $j$ 为某一列的编号、$a\ne0$ 为实数。将第 $j$ 列乘以 $a$，同时将对应系数除以 $a$，其余列与系数不变。记变换后的矩阵和系数为 $X',w'$，即
+
+$$
+X'_j=aX_j,\qquad w'_j=\frac{w_j}{a}.
+$$
+用代数计算验证训练预测不变，并写出第 $j$ 项正则化惩罚在变换前后的表达式。这里 $X_j$ 表示第 $j$ 列，$w$ 是任意给定系数。
+
+## 第三题：误差指标与误差估计（20 分，约 25–30 分钟）
+$m$ 为评估样本数，$y_i$ 和 $\widehat y_i$ 为第 $i$ 个样本的真实值和预测值。定义
+
+$$
+e_i=\widehat y_i-y_i,\qquad \bar y=\frac1m\sum_{i=1}^my_i.
+$$
+本题使用以下指标，其中决定系数的分母假定非零：
+
+$$
+\begin{aligned}
+\operatorname{MSE}&=\frac1m\sum_{i=1}^me_i^2,\qquad
+\operatorname{MAE}=\frac1m\sum_{i=1}^m|e_i|,\\
+R^2&=1-\frac{\sum_{i=1}^me_i^2}{\sum_{i=1}^m(y_i-\bar y)^2}.
+\end{aligned}
+$$
+**（1）（8 分）** 计算下列一个模型的三项指标：
+
+$$
+m=4,\qquad y=(1,2,3,4)^\top,\qquad
+\widehat y=(1,2,3,8)^\top.
+$$
+**（2）（6 分）** 两个互不重叠的评估子集分别有 $m_1,m_2$ 个样本，一个模型在这两个子集上的均方误差分别为 $M_1,M_2$，数值为
+
+$$
+m_1=90,\qquad m_2=10,\qquad M_1=1,\qquad M_2=9.
+$$
+从两个子集的残差平方和出发，计算合并全部样本后的均方误差。
+
+**（3）（6 分）** 设 $K$ 为正整数，$\widehat R_j$ 为第 $j$ 个候选模型的随机误差估计，$\mathbb E$ 表示期望。假设
+
+$$
+\mathbb E[|\widehat R_j|]<\infty,\qquad
+R_j=\mathbb E[\widehat R_j],\qquad j=1,\ldots,K.
+$$
+证明不等式：
+
+$$
+\mathbb E\left[\min_{1\leq j\leq K}\widehat R_j\right]
+\leq\min_{1\leq j\leq K}R_j.
+$$
+
+## 第四题：Ridge 与 Lasso 的解（24 分，约 35–45 分钟）
+$n,d$ 为正整数，$X$ 为特征矩阵，$y$ 为响应向量，$w$ 为系数。维度及模型为
+
+$$
+X\in\mathbb R^{n\times d},\qquad y\in\mathbb R^n,\qquad
+w\in\mathbb R^d,\qquad \widehat y=Xw.
+$$
+$X_j$ 表示第 $j$ 列，$I_d$ 为单位矩阵，上标 $\top$ 表示转置。对实向量 $v$，记
+
+$$
+\|v\|_2^2=\sum_jv_j^2,\qquad \|v\|_1=\sum_j|v_j|.
+$$
+固定参数 $\lambda>0$，定义
+
+$$
+\begin{aligned}
+J_R(w)&=\frac1{2n}\|y-Xw\|_2^2+\frac\lambda2\|w\|_2^2,\\
+J_L(w)&=\frac1{2n}\|y-Xw\|_2^2+\lambda\|w\|_1.
+\end{aligned}
+$$
+**（1）（8 分）** 假设列向量满足以下条件，并定义向量 $z$：
+
+$$
+\frac1nX^\top X=I_d,\qquad z=\frac1nX^\top y.
+$$
+推导 Lasso 最小化解的各分量。需分正、负、零三种情况，在零点使用左右导数，写出包含边界的分段式。
+
+**（2）（4 分）** 在相同的列向量条件下，利用以下已给公式计算指定参数对应的 Ridge 系数向量，可以使用公式：
+
+$$
+\begin{aligned}
+\widehat w_R&=\frac{z}{1+\lambda},\\
+d&=3,\qquad z=(2,-0.6,0.1)^\top,\qquad \lambda=0.5.
+\end{aligned}
+$$
+**（3）（8 分）** 本小问改设两列完全相同，向量 $x$ 和标量 $c$ 满足
+
+$$
+\begin{aligned}
+d&=2,\qquad X_1=X_2=x\in\mathbb R^n,\\
+\frac1n\|x\|_2^2&=1,\qquad c=\frac1nx^\top y>\lambda>0.
+\end{aligned}
+$$
+求 Lasso 的全部最小化解并给出推导。可令系数和 $s=w_1+w_2$，利用
+
+$$
+|w_1|+|w_2|\geq|s|
+$$
+及等号条件，将问题化为关于系数和的一元问题。
+
+**（4）（4 分）** 固定其他系数后，第 $j$ 个系数的一元目标如下。其中 $a_j>0$、$\rho_j$ 为给定实数，$u$ 表示待更新的系数：
+
+$$
+q_j(u)=\frac{a_j}{2}u^2-\rho_ju+\lambda|u|,\qquad u\in\mathbb R.
+$$
+写出使该目标最小的系数更新值。可直接利用第（1）小问的分段求导结果，无需重新展开原目标或重复完整证明。
+
+## 第五题：一维 Ridge 的误差（20 分，约 30–40 分钟）
+$n$ 为正整数，输入 $x_1,\ldots,x_n$ 为固定实数，$\beta\in\mathbb R$ 为固定真实系数。响应模型为
+
+$$
+s=\frac1n\sum_{i=1}^nx_i^2>0,\qquad
+y_i=\beta x_i+\varepsilon_i\quad(i=1,\ldots,n).
+$$
+训练噪声相互独立。$\mathbb E$ 和 $\operatorname{Var}$ 分别表示期望与方差，并假设
+
+$$
+\mathbb E[\varepsilon_i]=0,\qquad
+\operatorname{Var}(\varepsilon_i)=\sigma^2>0.
+$$
+对参数 $\lambda\geq0$，Ridge 系数估计量及其偏差、方差和均方误差记为
+
+$$
+\begin{aligned}
+\widehat\beta_\lambda
+&=\frac{s\beta+n^{-1}\sum_{i=1}^nx_i\varepsilon_i}{s+\lambda},\\
+B_\lambda&=\mathbb E[\widehat\beta_\lambda]-\beta,\qquad
+V_\lambda=\operatorname{Var}(\widehat\beta_\lambda),\\
+M_\lambda&=\mathbb E[(\widehat\beta_\lambda-\beta)^2].
+\end{aligned}
+$$
+以上估计量表达式可直接使用。
+
+**（1）（8 分）** 推导偏差 $B_\lambda$ 和方差 $V_\lambda$。
+
+**（2）（6 分）** 已知下列均方误差公式：
+
+$$
+M_\lambda=\frac{\lambda^2\beta^2+s\sigma^2/n}{(s+\lambda)^2}.
+$$
+取下列参数，通过求导求使均方误差最小的 $\lambda\geq0$：
+
+$$
+s=1,\qquad n=20,\qquad \sigma^2=4,\qquad \beta=1.
+$$
+只需求最优参数，不要求其他参数取值的误差表或零真实系数情形。
+
+**（3）（6 分）** 固定新输入 $x_0\in\mathbb R$，新响应为
+
+$$
+Y_0=\beta x_0+\varepsilon_0.
+$$
+其中 $\varepsilon_0$ 独立于全部训练噪声，均值为 $0$、方差为 $\sigma^2$。只用 $M_\lambda$、$x_0$ 和 $\sigma^2$ 表示下列预测误差期望，并给出推导：
+
+$$
+\mathbb E[(Y_0-x_0\widehat\beta_\lambda)^2].
+$$
+期望同时对训练噪声和新样本噪声计算，无需代入数值。

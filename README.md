@@ -26,24 +26,39 @@ git pull
 | 类型 | 编号 | 内容 | 主要文件 |
 | --- | --- | --- | --- |
 | 书面作业 | HW0 | 数学基础诊断 | `HWs/HW0/hw0.pdf` |
+| 书面作业 | HW1 | 线性模型、正则化与性能评估 | `HWs/HW1/hw1.pdf` |
 | 实验 | LAB0 | Git、Conda、VS Code 与机器学习环境配置 | `LABs/LAB0/lab0.pdf`、`verify_env.py`、`environment.yml` |
+| 实验 | LAB1 | 线性回归、梯度下降、联合调参与性能评估 | `LABs/LAB1/lab1.pdf`、`README.md`、`src/`、`environment.yml` |
 
-后续 HW1--HW5/6 与 LAB1--LAB4 将按课程进度陆续加入。
+后续作业与实验将按课程进度陆续加入。
 
 ## 目录结构
 
 ```text
 ALML_public/
 |-- HWs/
-|   `-- HW0/
-|       |-- hw0.pdf
-|       `-- hw0.tex
+|   |-- HW0/
+|   |   |-- hw0.pdf
+|   |   `-- hw0.tex
+|   `-- HW1/
+|       |-- hw1.pdf
+|       |-- hw1.tex
+|       `-- hw1.md
 `-- LABs/
-    `-- LAB0/
-        |-- lab0.pdf
-        |-- lab0.tex
+    |-- LAB0/
+    |   |-- lab0.pdf
+    |   |-- lab0.tex
+    |   |-- environment.yml
+    |   `-- verify_env.py
+    `-- LAB1/
+        |-- lab1.pdf
+        |-- lab1.tex
+        |-- lab1.md
+        |-- README.md
         |-- environment.yml
-        `-- verify_env.py
+        |-- requirements.txt
+        |-- src/
+        `-- data/dev.csv
 ```
 
 PDF 是正式发布版本；同时提供 TeX 源文件便于无障碍阅读、检索和报告排版参考。实验所需代码和环境文件位于对应 LAB 目录。
@@ -54,6 +69,13 @@ PDF 是正式发布版本；同时提供 TeX 源文件便于无障碍阅读、�
 2. 使用 `environment.yml` 创建并激活 `ai3002` 环境。
 3. 在 `LABs/LAB0` 目录运行 `verify_env.py`。
 4. 将脚本生成的 64 位 SHA256 提交至 [TensorJudge 课程 OJ](https://oj.temaurinum.moe/) 中的 LAB0。
+
+## HW1 与 LAB1 提交
+
+- HW1：将 `学号-姓名-HW1.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)。
+- LAB1：将实验报告 `学号-姓名-LAB1.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)，将 `submission.py` 单独上传至 [课程 OJ](https://oj.temaurinum.moe)，不接收其他文件。OJ 负责代码 40 分与最终性能 10 分，报告占 50 分。
+- LAB1 须新建 `ai3002-lab1` 环境，具体任务与运行命令见 `LABs/LAB1/README.md` 和实验 PDF。
+- HW1 与 LAB1 的截止时间均为 **2026 年 10 月 19 日 06:00（北京时间）**；LAB1 的报告与代码须在此时间前分别提交。提交入口以课程通知为准。
 
 ## 通过 GitHub Issues 提问
 
