@@ -1,0 +1,507 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\geometry{left=2.2cm,right=2.2cm,top=2.1cm,bottom=2.1cm}
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.35em}
+\setlist[enumerate,1]{label=\textbf{(\alph*)},leftmargin=2.7em,itemsep=0.8em,topsep=0.45em}
+
+\definecolor{answerblue}{RGB}{30,78,121}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\grad}{\nabla}
+\newcommand{\ans}{\textcolor{answerblue}{\textbf{参考解答：}}}
+\newenvironment{question}{%
+  \par\begingroup\color{black!82}\noindent\textbf{题目：}\ignorespaces
+}{%
+  \par\endgroup\smallskip
+}
+\hypersetup{colorlinks=true,urlcolor=blue!65!black}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{AI3002 人工智能与机器学习基础}
+\rhead{HW0 参考解答}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \lhead{AI3002 人工智能与机器学习基础}%
+  \rhead{HW0 参考解答}%
+  \cfoot{\thepage}%
+  \renewcommand{\headrulewidth}{0.4pt}%
+}
+
+\title{\vspace{-1.4cm}\textbf{人工智能与机器学习基础\\HW0：数学基础诊断题目与参考解答}}
+\author{中国科学技术大学}
+\date{2026 年秋季学期\quad 公开版}
+
+\begin{document}
+
+\maketitle
+\pagestyle{fancy}
+\thispagestyle{fancy}
+
+本文档收录 HW0 的完整题目与参考解答，供核对计算、复习方法和查找薄弱环节使用。每道题的解答紧随题目给出；所列方法并非唯一，复习时请关注推导依据与各步计算。
+
+\section{向量与矩阵}
+
+\begin{question}
+设数据矩阵 $X\in\R^{n\times d}$，参数向量 $\bm w\in\R^d$，标签向量
+$\bm y\in\R^n$，并定义预测向量
+\[
+  \hat{\bm y}=X\bm w.
+\]
+\end{question}
+
+\begin{enumerate}
+  \item
+  \begin{question}
+  分别写出 $X^\top X$、$X^\top\bm y$、$XX^\top$ 和
+  $\hat{\bm y}-\bm y$ 的维度。
+  \end{question}
+  \ans
+  由
+  \[
+    X\in\R^{n\times d},\qquad X^\top\in\R^{d\times n},
+    \qquad \bm w\in\R^d,\qquad \bm y\in\R^n
+  \]
+  可得
+  \[
+    X^\top X\in\R^{d\times d},\qquad
+    X^\top\bm y\in\R^d,\qquad
+    XX^\top\in\R^{n\times n},\qquad
+    \hat{\bm y}-\bm y\in\R^n.
+  \]
+  这里把列向量的维度记为 $\R^d$ 或 $\R^n$；若写成矩阵形状，则分别为
+  $d\times1$ 和 $n\times1$。
+
+  \item
+  \begin{question}
+  取
+  \[
+    X=\begin{bmatrix}
+      1&2\\
+      0&-1\\
+      2&1
+    \end{bmatrix},\qquad
+    \bm w=\begin{bmatrix}1\\-1\end{bmatrix},\qquad
+    \bm y=\begin{bmatrix}0\\1\\2\end{bmatrix}.
+  \]
+  计算 $X\bm w$、$X\bm w-\bm y$ 以及
+  $X^\top(X\bm w-\bm y)$。
+  \end{question}
+  \ans
+  首先计算预测向量：
+  \[
+    X\bm w
+    =\begin{bmatrix}
+       1&2\\0&-1\\2&1
+     \end{bmatrix}
+     \begin{bmatrix}1\\-1\end{bmatrix}
+    =\begin{bmatrix}-1\\1\\1\end{bmatrix}.
+  \]
+  因而残差为
+  \[
+    X\bm w-\bm y
+    =\begin{bmatrix}-1\\1\\1\end{bmatrix}
+     -\begin{bmatrix}0\\1\\2\end{bmatrix}
+    =\begin{bmatrix}-1\\0\\-1\end{bmatrix}.
+  \]
+  最后
+  \[
+    X^\top(X\bm w-\bm y)
+    =\begin{bmatrix}1&0&2\\2&-1&1\end{bmatrix}
+     \begin{bmatrix}-1\\0\\-1\end{bmatrix}
+    =\begin{bmatrix}-3\\-3\end{bmatrix}.
+  \]
+
+  \item
+  \begin{question}
+  对向量 $\bm a=(1,2,-1)^\top$ 和 $\bm b=(2,0,2)^\top$，计算它们的
+  内积、$\ell_2$ 范数以及余弦相似度
+  \[
+    \frac{\bm a^\top\bm b}{\lVert\bm a\rVert_2\lVert\bm b\rVert_2}.
+  \]
+  根据结果说明两向量是否正交。
+  \end{question}
+  \ans
+  两向量的内积为
+  \[
+    \bm a^\top\bm b=1\cdot2+2\cdot0+(-1)\cdot2=0.
+  \]
+  它们的 $\ell_2$ 范数分别为
+  \[
+    \lVert\bm a\rVert_2=\sqrt{1^2+2^2+(-1)^2}=\sqrt6,
+    \qquad
+    \lVert\bm b\rVert_2=\sqrt{2^2+0^2+2^2}=\sqrt8=2\sqrt2.
+  \]
+  因此余弦相似度为
+  \[
+    \frac{\bm a^\top\bm b}{\lVert\bm a\rVert_2\lVert\bm b\rVert_2}
+    =\frac{0}{\sqrt6\,\sqrt8}=0.
+  \]
+  两向量均非零且内积为零，所以它们\textbf{正交}。
+\end{enumerate}
+
+\section{特征值与二次型}
+
+\begin{question}
+给定对称矩阵
+\[
+  A=\begin{bmatrix}2&1\\1&2\end{bmatrix}.
+\]
+\end{question}
+
+\begin{enumerate}
+  \item
+  \begin{question}
+  求 $A$ 的两个特征值，并为每个特征值写出一个对应的单位特征向量。
+  \end{question}
+  \ans
+  特征多项式为
+  \[
+    \det(A-\lambda I)
+    =\begin{vmatrix}2-\lambda&1\\1&2-\lambda\end{vmatrix}
+    =(2-\lambda)^2-1
+    =(\lambda-1)(\lambda-3).
+  \]
+  故两个特征值为 $\lambda_1=3$ 和 $\lambda_2=1$。可取对应的单位特征向量
+  \[
+    \lambda_1=3:\quad
+    \bm q_1=\frac{1}{\sqrt2}\begin{bmatrix}1\\1\end{bmatrix},
+    \qquad
+    \lambda_2=1:\quad
+    \bm q_2=\frac{1}{\sqrt2}\begin{bmatrix}1\\-1\end{bmatrix}.
+  \]
+  单位特征向量的选取并不唯一；整体乘以 $-1$ 后，仍是同一特征值对应的单位特征向量。
+
+  \item
+  \begin{question}
+  判断 $A$ 是否为正定矩阵，并说明理由。你可以使用特征值，也可以直接整理二次型
+  \[
+    \bm x^\top A\bm x,\qquad \bm x=(x_1,x_2)^\top.
+  \]
+
+  \end{question}
+  \ans
+  $A$ 是实对称矩阵，且两个特征值 $3$、$1$ 都严格大于零，所以 $A$ 为正定矩阵。
+  也可以直接考察二次型：
+  \[
+    \bm x^\top A\bm x
+    =2x_1^2+2x_1x_2+2x_2^2
+    =(x_1+x_2)^2+x_1^2+x_2^2.
+  \]
+  当 $\bm x\ne\bm0$ 时，上式严格大于零，因此同样得到 $A\succ0$。
+
+  \item
+  \begin{question}
+  不显式计算矩阵逆，利用特征向量或直接求解线性方程，求满足
+  \[
+    A\bm x=\begin{bmatrix}3\\3\end{bmatrix}
+  \]
+  的 $\bm x$。
+  \end{question}
+  \ans
+  线性方程组为
+  \[
+    2x_1+x_2=3,
+    \qquad
+    x_1+2x_2=3.
+  \]
+  两式相减得 $x_1=x_2$，代回可得 $3x_1=3$，故
+  \[
+    \boxed{\bm x=\begin{bmatrix}1\\1\end{bmatrix}}.
+  \]
+\end{enumerate}
+
+\section{多元微积分与链式法则}
+
+\begin{question}
+设 $W\in\R^{m\times d}$、$\bm x\in\R^d$、$\bm b,\bm y\in\R^m$，定义
+\[
+  \bm z=W\bm x+\bm b,
+  \qquad
+  L=\frac{1}{2}\lVert\bm z-\bm y\rVert_2^2.
+\]
+\end{question}
+
+记残差向量
+\[
+  \bm r=\bm z-\bm y=W\bm x+\bm b-\bm y.
+\]
+
+\begin{enumerate}
+  \item
+  \begin{question}
+  将 $L$ 写成求和形式，即写成关于 $z_i$ 和 $y_i$ 的表达式，并求
+  $\partial L/\partial z_i$。
+  \end{question}
+  \ans
+  \[
+    L=\frac12\lVert\bm z-\bm y\rVert_2^2
+     =\frac12\sum_{i=1}^{m}(z_i-y_i)^2.
+  \]
+  对任意 $i$，
+  \[
+    \frac{\partial L}{\partial z_i}
+    =\frac12\cdot2(z_i-y_i)=z_i-y_i.
+  \]
+  因而 $\grad_{\bm z}L=\bm z-\bm y=\bm r$。
+
+  \item
+  \begin{question}
+  使用链式法则求 $\grad_{\bm b}L$ 和 $\grad_{\bm x}L$。请同时写出它们的维度。
+  \end{question}
+  \ans
+  由于 $\partial\bm z/\partial\bm b=I_m$，有
+  \[
+    \boxed{\grad_{\bm b}L=\bm z-\bm y=\bm r\in\R^m}.
+  \]
+  又因为 $\bm z=W\bm x+\bm b$ 对 $\bm x$ 的雅可比矩阵为 $W$，链式法则给出
+  \[
+    \boxed{\grad_{\bm x}L=W^\top(\bm z-\bm y)=W^\top\bm r\in\R^d}.
+  \]
+
+  \item
+  \begin{question}
+  求 $\grad_W L$。答案应为一个 $m\times d$ 矩阵，并尽量写成向量外积的形式。
+  \end{question}
+  \ans
+  对矩阵元素 $W_{ij}$，有 $z_i=\sum_{k=1}^{d}W_{ik}x_k+b_i$，因此
+  \[
+    \frac{\partial L}{\partial W_{ij}}
+    =\frac{\partial L}{\partial z_i}\frac{\partial z_i}{\partial W_{ij}}
+    =(z_i-y_i)x_j=r_i x_j.
+  \]
+  把所有元素排列成矩阵，即得外积形式
+  \[
+    \boxed{\grad_W L=(\bm z-\bm y)\bm x^\top=\bm r\bm x^\top
+    \in\R^{m\times d}}.
+  \]
+
+  \item
+  \begin{question}
+  Sigmoid 函数定义为
+  \[
+    \sigma(t)=\frac{1}{1+e^{-t}}.
+  \]
+  证明
+  \[
+    \sigma'(t)=\sigma(t)\bigl(1-\sigma(t)\bigr).
+  \]
+
+  \end{question}
+  \ans
+  对 $\sigma(t)=(1+e^{-t})^{-1}$ 求导：
+  \begin{align*}
+    \sigma'(t)
+    &=-(1+e^{-t})^{-2}(-e^{-t})\\
+    &=\frac{e^{-t}}{(1+e^{-t})^2}.
+  \end{align*}
+  另一方面，
+  \[
+    1-\sigma(t)
+    =1-\frac{1}{1+e^{-t}}
+    =\frac{e^{-t}}{1+e^{-t}}.
+  \]
+  所以
+  \[
+    \sigma(t)\bigl(1-\sigma(t)\bigr)
+    =\frac{1}{1+e^{-t}}\frac{e^{-t}}{1+e^{-t}}
+    =\frac{e^{-t}}{(1+e^{-t})^2}
+    =\sigma'(t).
+  \]
+\end{enumerate}
+
+\section{概率与统计}
+
+\begin{enumerate}
+  \item
+  \begin{question}
+  某事件 $D$ 的先验概率为 $P(D)=0.1$。一个检测方法满足
+  \[
+    P(+\mid D)=0.9,
+    \qquad
+    P(-\mid D^c)=0.95.
+  \]
+  计算 $P(+)$ 和 $P(D\mid +)$。请写出使用的全概率公式和贝叶斯公式。
+  \end{question}
+  \ans
+  由 $P(-\mid D^c)=0.95$，可得在事件 $D$ 不发生时检测结果为阳性的概率
+  \[
+    P(+\mid D^c)=1-P(-\mid D^c)=0.05.
+  \]
+  由全概率公式，
+  \begin{align*}
+    P(+)
+    &=P(+\mid D)P(D)+P(+\mid D^c)P(D^c)\\
+    &=0.9\times0.1+0.05\times0.9\\
+    &=0.135.
+  \end{align*}
+  再由贝叶斯公式，
+  \[
+    P(D\mid+)
+    =\frac{P(+\mid D)P(D)}{P(+)}
+    =\frac{0.9\times0.1}{0.135}
+    =\frac23\approx0.6667.
+  \]
+
+  \item
+  \begin{question}
+  离散随机变量 $X$ 的分布如下：
+  \[
+  \begin{array}{c|ccc}
+    x & -1 & 0 & 2\\ \hline
+    P(X=x) & 0.2 & 0.5 & 0.3
+  \end{array}
+  \]
+  计算 $\E[X]$、$\E[X^2]$ 和 $\Var(X)$。
+  \end{question}
+  \ans
+  \begin{align*}
+    \E[X]
+    &=(-1)\times0.2+0\times0.5+2\times0.3=0.4,\\
+    \E[X^2]
+    &=(-1)^2\times0.2+0^2\times0.5+2^2\times0.3=1.4.
+  \end{align*}
+  因此
+  \[
+    \Var(X)=\E[X^2]-\bigl(\E[X]\bigr)^2
+    =1.4-0.4^2
+    =\boxed{1.24}.
+  \]
+
+  \item
+  \begin{question}
+  判断下面的说法是否正确，并用一句话说明理由：
+  \begin{quote}
+    若 $\Cov(X,Y)=0$，则随机变量 $X$ 与 $Y$ 一定相互独立。
+  \end{quote}
+  如果你认为不正确，请给出一个简单反例。
+  \end{question}
+  \ans
+  该说法\textbf{不正确}。零协方差只表示两个随机变量线性不相关，一般不能推出独立。
+
+  例如令 $X$ 在 $\{-1,0,1\}$ 上均匀分布，并令 $Y=X^2$。则
+  \[
+    \E[X]=0,
+    \qquad
+    \E[XY]=\E[X^3]=0,
+  \]
+  所以
+  \[
+    \Cov(X,Y)=\E[XY]-\E[X]\E[Y]=0.
+  \]
+  然而，当已知 $X=0$ 时，必有 $Y=0$。于是
+  \[
+    P(Y=0\mid X=0)=1
+    \ne P(Y=0)=\frac13.
+  \]
+  条件概率与边缘概率不同，因此 $X$ 与 $Y$ 不独立。
+\end{enumerate}
+
+\section{梯度下降}
+
+\begin{question}
+考虑函数
+\[
+  f(w_1,w_2)=(w_1-1)^2+2(w_2+1)^2.
+\]
+\end{question}
+
+\begin{enumerate}
+  \item
+  \begin{question}
+  求梯度 $\grad f(w_1,w_2)$，并写出函数的全局最小点。
+  \end{question}
+  \ans
+  \[
+    \grad f(w_1,w_2)
+    =\begin{bmatrix}
+       2(w_1-1)\\
+       4(w_2+1)
+     \end{bmatrix}.
+  \]
+  函数是两个非负平方项之和，仅当 $w_1=1$、$w_2=-1$ 时取零，故全局最小点为
+  \[
+    \boxed{\bm w^*=\begin{bmatrix}1\\-1\end{bmatrix}},
+    \qquad f(\bm w^*)=0.
+  \]
+
+  \item
+  \begin{question}
+  从 $\bm w^{(0)}=(0,0)^\top$ 出发，使用学习率 $\eta=0.25$ 做一步梯度下降：
+  \[
+    \bm w^{(1)}=\bm w^{(0)}-\eta\grad f\bigl(\bm w^{(0)}\bigr).
+  \]
+  求 $\bm w^{(1)}$ 以及 $f(\bm w^{(0)})$、$f(\bm w^{(1)})$。
+  \end{question}
+  \ans
+  在 $\bm w^{(0)}=(0,0)^\top$ 处，
+  \[
+    \grad f\bigl(\bm w^{(0)}\bigr)
+    =\begin{bmatrix}-2\\4\end{bmatrix}.
+  \]
+  当 $\eta=0.25$ 时，
+  \[
+    \bm w^{(1)}
+    =\begin{bmatrix}0\\0\end{bmatrix}
+     -0.25\begin{bmatrix}-2\\4\end{bmatrix}
+    =\boxed{\begin{bmatrix}0.5\\-1\end{bmatrix}}.
+  \]
+  更新前后的函数值分别为
+  \[
+    f\bigl(\bm w^{(0)}\bigr)=(-1)^2+2(1)^2=3,
+  \]
+  \[
+    f\bigl(\bm w^{(1)}\bigr)=(0.5-1)^2+2(-1+1)^2
+    =\boxed{0.25}.
+  \]
+  因此这一步使目标函数下降。
+
+  \item
+  \begin{question}
+  若改用学习率 $\eta=1$，同样从 $\bm w^{(0)}$ 做一步更新，目标函数会下降还是上升？
+  这个例子说明学习率过大可能产生什么问题？
+  \end{question}
+  \ans
+  当 $\eta=1$ 时，
+  \[
+    \bm w^{(1)}
+    =\begin{bmatrix}0\\0\end{bmatrix}
+     -\begin{bmatrix}-2\\4\end{bmatrix}
+    =\begin{bmatrix}2\\-4\end{bmatrix}.
+  \]
+  此时
+  \[
+    f(2,-4)=(2-1)^2+2(-4+1)^2=1+18=19>3.
+  \]
+  所以目标函数反而\textbf{上升}。该例说明学习率过大时，更新可能越过最小点，造成振荡，甚至使优化过程发散。
+\end{enumerate}
+
+\section*{完成情况反馈}
+
+\begin{question}
+请在提交末尾简要填写：
+\begin{enumerate}[label=\arabic*.,leftmargin=2em]
+  \item 完成本次作业大约花费了多长时间？
+  \item 哪一部分最不熟悉：线性代数、微积分、概率统计，还是优化？
+  \item 是否希望课程提供某一部分的补充讲义或习题课？
+\end{enumerate}
+\end{question}
+
+\ans 此部分为自我反馈，没有统一答案。可结合完成作业时的实际情况，记录用时、尚不熟悉的知识点以及希望补充学习的内容。
+
+\end{document}
