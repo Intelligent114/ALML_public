@@ -1,0 +1,44 @@
+{
+  "signals": 3,
+  "train_per_signal": 256,
+  "validation_per_signal": 256,
+  "grid": 2048,
+  "bands": [
+    [
+      1,
+      2
+    ],
+    [
+      3,
+      4,
+      5
+    ],
+    [
+      7,
+      8,
+      9,
+      10
+    ],
+    [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ]
+  ],
+  "amplitudes": [
+    1.203858530857692,
+    0.601929265428846,
+    0.3611575592573076,
+    0.2407717061715384
+  ],
+  "source": "course-generated synthetic data",
+  "files": {
+    "image.npz": "29ee74578f3e9157b5f5db0f1e24b1b92235e17b14406fc40ae69e1dd2daa58b",
+    "signal0.npz": "6807135c8e1f2add1f8959de79dfd03c95a416d5880de11e85fdbd855edf0317",
+    "signal1.npz": "990949feb483bd9829f5fe1345f2ead0307e3a4ede0e0e4f73a62de7ad525de9",
+    "signal2.npz": "fc2507331a75a16b927371bca1e1f599e2c13de953a0d8fe6a6df8d0fda626c4"
+  }
+}

@@ -29,6 +29,7 @@ git pull
 | 书面作业 | HW1 | 线性模型、正则化与性能评估 | `HWs/HW1/hw1.pdf` |
 | 实验 | LAB0 | Git、Conda、VS Code 与机器学习环境配置 | `LABs/LAB0/lab0.pdf`、`verify_env.py`、`environment.yml` |
 | 实验 | LAB1 | 线性回归、梯度下降、联合调参与性能评估 | `LABs/LAB1/lab1.pdf`、`README.md`、`src/`、`environment.yml` |
+| 实验 | LAB2 | 神经网络如何学习不同频率的信号 | [实验 PDF](LABs/LAB2/lab2.pdf) · [运行说明、代码与数据](LABs/LAB2/) |
 | 习题课 | TUT01 | 向量与矩阵的微分 | [讲义 PDF](Tutorials/TUT01/vector_matrix_differentials.pdf) |
 
 第一次习题课时间为 **2026 年 9 月 25 日（周五）20:00（北京时间）**。安排见[课程网站习题课栏目](https://aiml.temaurinum.moe/tutorials/)。
@@ -58,15 +59,23 @@ ALML_public/
     |   |-- lab0.tex
     |   |-- environment.yml
     |   `-- verify_env.py
-    `-- LAB1/
-        |-- lab1.pdf
-        |-- lab1.tex
-        |-- lab1.md
+    |-- LAB1/
+    |   |-- lab1.pdf
+    |   |-- lab1.tex
+    |   |-- lab1.md
+    |   |-- README.md
+    |   |-- environment.yml
+    |   |-- requirements.txt
+    |   |-- src/
+    |   `-- data/dev.csv
+    `-- LAB2/
+        |-- lab2.pdf
+        |-- lab2.tex
         |-- README.md
         |-- environment.yml
         |-- requirements.txt
         |-- src/
-        `-- data/dev.csv
+        `-- data/
 ```
 
 PDF 是正式发布版本；同时提供 TeX 源文件便于无障碍阅读、检索和报告排版参考。实验所需代码和环境文件位于对应 LAB 目录。
@@ -84,6 +93,14 @@ PDF 是正式发布版本；同时提供 TeX 源文件便于无障碍阅读、�
 - LAB1：将实验报告 `学号-姓名-LAB1.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)，将 `submission.py` 单独上传至 [课程 OJ](https://oj.temaurinum.moe)，不接收其他文件。OJ 负责代码 40 分与最终性能 10 分，报告占 50 分。
 - LAB1 须新建 `ai3002-lab1` 环境，具体任务与运行命令见 `LABs/LAB1/README.md` 和实验 PDF。
 - HW1 与 LAB1 的截止时间均为 **2026 年 10 月 19 日 06:00（北京时间）**；LAB1 的报告与代码须在此时间前分别提交。提交入口以课程通知为准。
+
+## LAB2 提交
+
+LAB2 为个人实验，主题是神经网络如何学习不同频率的信号。截止时间为 **2026 年 11 月 23 日 06:00**。
+
+- 使用 `LABs/LAB2/environment.yml` 新建 `ai3002-lab2` 环境，CPU 即可；只修改 `src/submission.py`。完整任务和命令见 [LAB2 实验 PDF](LABs/LAB2/lab2.pdf) 与 [运行说明](LABs/LAB2/README.md)。
+- 实验报告 `学号-姓名-LAB2.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)，占 50 分。
+- 单个 `submission.py` 上传至 [OJ 的 LAB2](https://oj.temaurinum.moe/labs/lab2-frequency-learning/)，代码占 40 分，最终性能占 10 分。不接收其他文件。
 
 ## 通过 GitHub Issues 提问
 
