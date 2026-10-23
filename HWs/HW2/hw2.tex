@@ -1,0 +1,204 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath,amssymb,bm,dsfont}
+\usepackage{geometry,fancyhdr,enumitem,needspace,xcolor,booktabs}
+\usepackage{xurl,hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,decorations.pathreplacing}
+\geometry{left=2.15cm,right=2.15cm,top=2.05cm,bottom=2.05cm}
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.3em}
+\setlength{\emergencystretch}{2em}
+\setlist[itemize]{leftmargin=2em,itemsep=0.2em}
+\definecolor{courseblue}{HTML}{2457A6}
+\hypersetup{colorlinks=true,urlcolor=courseblue,linkcolor=courseblue,pdftitle={HW2 神经网络与反向传播},pdfauthor={中国科学技术大学}}
+\newcommand{\R}{\mathbb R}
+\newcommand{\relu}{\operatorname{ReLU}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\partq}[2]{\par\Needspace{5\baselineskip}\noindent\textbf{（#1）（#2 分）}}
+\newcommand{\answer}{\par\Needspace{5\baselineskip}\noindent\textcolor{courseblue}{\textbf{参考解答}}\par}
+\newcommand{\rubric}[1]{\par\noindent\textcolor{courseblue}{\textbf{评分标准：}}#1\par}
+\pagestyle{fancy}\fancyhf{}
+\lhead{AI3002 人工智能与机器学习基础}
+\rhead{HW2：神经网络与反向传播}\cfoot{\thepage}
+\title{\vspace{-1cm}\textbf{人工智能与机器学习基础\\HW2：神经网络与反向传播}}
+\author{中国科学技术大学}
+\date{2026 年秋季学期\quad 学生版\\[0.3em]截止时间：2026 年 11 月 23 日 06:00}
+\begin{document}\maketitle\thispagestyle{fancy}
+个人完成，预计 4--6 小时，满分 100 分。共五道大题、15 个小问；各大题独立，符号与假设以本题为准。第一题简要文字作答，第二至第五题只需给出所要求的计算或推导。题中已给公式可直接使用，无需另证。
+
+允许使用 AI 辅助，但须在文末说明使用方式，并提供至少一项独立核验记录，例如代入特例、核对维度或使用有限差分检查梯度；未使用 AI 的同学同样给出一项自检。最终答案应能由本人独立解释。
+
+\section*{提交要求}
+按题号作答，保留必要步骤；提交一个 PDF，命名为\texttt{学号-姓名-HW2.pdf}，上传至 Blackboard（\href{https://bb.ustc.edu.cn}{bb.ustc.edu.cn}）。截止时间为 2026 年 11 月 23 日 06:00。如有疑问，请通过\href{https://github.com/Intelligent114/ALML_public/issues}{课程仓库 Issues}提问，注明 HW2 和题号，不要公开个人信息或完整答案。
+\section[训练现象与实验判断]{训练现象与实验判断\hfill\textcolor{gray}{[12 分]}}
+
+本题均考虑使用梯度下降训练的前馈神经网络。各小问互不依赖。
+
+\partq{1}{4} 隐藏层含多个神经元，它们的激活函数相同，输入权重、偏置及通向下一层的对应权重均初始化为相同值。训练中使用相同批次、不引入随机扰动。说明这种初始化可能造成什么问题，并给出一种修正方法。
+
+\partq{2}{4} 在数据、批次顺序与训练预算固定的实验中，训练损失从开始就大幅振荡，并很快出现非有限数值。一位同学建议先增大正则化强度。给出一种更直接的排查实验，并说明什么观测结果支持“学习率过大”这一解释。
+
+\partq{3}{4} 某模型的训练损失持续下降，验证损失先下降后持续上升。说明应如何选择用于最终测试的模型，并指出为什么不能根据测试集结果决定停止时刻。
+
+\clearpage
+\section[Softmax 与交叉熵]{Softmax 与交叉熵\hfill\textcolor{gray}{[22 分]}}
+
+考虑一个具有 $K\geq2$ 个类别的分类模型。列向量 $z\in\R^K$ 为模型输出的分数，$y\in\R^K$ 为 one-hot 标签：真实类别对应分量为 $1$，其余为 $0$。定义
+\[
+p_k=\frac{\exp(z_k)}{\sum_{j=1}^K\exp(z_j)},\qquad
+\ell(z,y)=-\sum_{k=1}^K y_k\log p_k.
+\]
+这里 $p=(p_1,\ldots,p_K)^\top$，$\log$ 为自然对数，$\diag(p)$ 为以 $p$ 的分量作对角元的矩阵，$\mathds{1}_K$ 为全 $1$ 列向量。梯度统一记为列向量。
+
+\partq{1}{8} 推导 $\partial p_k/\partial z_j$，并由此求交叉熵对 $z$ 的梯度 $\nabla_z\ell$。分别写出 $j=k$ 和 $j\ne k$ 的导数，或用等价的统一公式。
+
+\partq{2}{8} 推导 Hessian 矩阵 $H=\nabla_z^2\ell$。对任意 $u\in\R^K$，将二次型 $u^\top Hu$ 写成非负的加权平方和，并计算 $H\mathds{1}_K$。
+
+\partq{3}{6} 取
+\[
+K=3,\qquad z=(1000,1000,999)^\top,\qquad y=(0,1,0)^\top.
+\]
+令 $m=\max_jz_j$。通过同时减去 $m$，写出不含 $\exp(1000)$ 的概率向量和损失表达式，并证明这种变换对任意有限 $z$ 都保持概率不变。数值可保留为含 $e^{-1}$ 的精确形式。
+
+\clearpage
+\section[两层网络的矩阵反向传播]{两层网络的矩阵反向传播\hfill\textcolor{gray}{[26 分]}}
+
+设正整数 $n,d,h$ 分别为样本数、输入维数和隐藏单元数。样本按行排列，使用一个隐藏层和标量线性输出：
+\[
+\begin{aligned}
+X&\in\R^{n\times d},\quad W\in\R^{d\times h},\quad b,v\in\R^h,
+\quad a\in\R,\quad y\in\R^n,\\
+A&=XW+\mathds{1}_n b^\top,\quad B=\relu(A),\\
+\widehat y&=Bv+a\mathds{1}_n,\qquad L=\frac1{2n}\|\widehat y-y\|_2^2.
+\end{aligned}
+\]
+其中 $\mathds{1}_n$ 为全 $1$ 列向量；$\relu(t)=\max\{0,t\}$ 逐元素作用。假设 $A$ 的元素均不为零，定义掩码 $M\in\R^{n\times h}$：当 $A_{ij}>0$ 时 $M_{ij}=1$，否则为 $0$。符号 $\odot$ （Hadamard 积）表示逐元素乘法，矩阵梯度与对应矩阵形状相同。
+
+
+% Network for one sample; matrix indices follow A = XW + 1 b^T.
+\begin{center}
+\begin{tikzpicture}[
+  x=1cm,y=1cm,>=Stealth,font=\small,
+  sum/.style={draw,circle,minimum size=7mm,inner sep=0pt},
+  activation/.style={draw,rounded corners=2pt,minimum width=11mm,minimum height=7mm,inner sep=2pt},
+  value/.style={inner sep=2pt},
+  weight/.style={font=\footnotesize,fill=white,inner sep=1pt},
+  flow/.style={->,line width=.45pt}
+]
+\node[value] (x1) at (0,.9) {$X_{i1}$};
+\node[value] (x2) at (0,-.9) {$X_{i2}$};
+\node[sum] (s1) at (3,.9) {$\sum$};
+\node[sum] (s2) at (3,-.9) {$\sum$};
+\node[activation] (r1) at (5.8,.9) {$\relu$};
+\node[activation] (r2) at (5.8,-.9) {$\relu$};
+\node[value] (h1) at (7.5,.9) {$B_{i1}$};
+\node[value] (h2) at (7.5,-.9) {$B_{i2}$};
+\node[sum] (out) at (10.2,0) {$\sum$};
+\node[value] (pred) at (12.1,0) {$\widehat y_i$};
+\node[value] (bias1) at (2.2,1.85) {$1$};
+\node[value] (bias2) at (2.2,-1.85) {$1$};
+\node[value] (biasout) at (9.4,1.65) {$1$};
+\draw[flow] (x1) -- node[weight,above,pos=.35] {$W_{11}$} (s1);
+\draw[flow] (x1) -- node[weight,sloped,below,pos=.15] {$W_{12}$} (s2);
+\draw[flow] (x2) -- node[weight,sloped,above,pos=.15] {$W_{21}$} (s1);
+\draw[flow] (x2) -- node[weight,below,pos=.35] {$W_{22}$} (s2);
+\draw[flow] (bias1) -- node[weight,sloped,above] {$b_1$} (s1);
+\draw[flow] (bias2) -- node[weight,sloped,below] {$b_2$} (s2);
+\draw[flow] (s1) -- node[above] {$A_{i1}$} (r1);
+\draw[flow] (s2) -- node[above] {$A_{i2}$} (r2);
+\draw[flow] (r1) -- (h1);
+\draw[flow] (r2) -- (h2);
+\draw[flow] (h1) -- node[weight,sloped,above,pos=.45] {$v_1$} (out);
+\draw[flow] (h2) -- node[weight,sloped,below,pos=.45] {$v_2$} (out);
+\draw[flow] (biasout) -- node[weight,sloped,above] {$a$} (out);
+\draw[flow] (out) -- (pred);
+\node at (0,-2.35) {输入};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt}]
+  (2.55,-2.1) -- (7.95,-2.1) node[midway,below=6pt] {隐藏层};
+\draw[decorate,decoration={brace,mirror,amplitude=4pt}]
+  (9.7,-2.1) -- (12.45,-2.1) node[midway,below=6pt] {线性输出层};
+\end{tikzpicture}
+\par\small 图示为 $d=h=2$ 时第 $i$ 个样本的前向计算，$i=1,\ldots,n$；各样本共享参数。
+\end{center}
+
+\partq{1}{10} 记 $r=\widehat y-y$。从链式法则出发，推导 $\nabla_vL$、$\partial L/\partial a$、$\nabla_WL$ 与 $\nabla_bL$，写出各自形状。
+
+\partq{2}{6} 取以下小规模实例，计算 $A$、$B$、$\widehat y$ 和 $L$：
+\[
+X=\begin{bmatrix}1&0\\0&1\end{bmatrix},\quad
+W=\begin{bmatrix}1&-1\\2&1\end{bmatrix},\quad
+b=\begin{bmatrix}0\\0\end{bmatrix},\quad
+v=\begin{bmatrix}1\\-1\end{bmatrix},\quad a=0,\quad
+y=\begin{bmatrix}0\\2\end{bmatrix}.
+\]
+\partq{3}{10} 对第（2）小问的同一组参数，取学习率
+\[
+\eta=0.1.
+\]
+计算一次反向传播的四个参数梯度，并使用梯度下降同时更新全部参数。写出更新后的 $W^+$、$b^+$、$v^+$ 和 $a^+$，保留必要的中间步骤。所有梯度均在更新前的参数处计算。
+
+\clearpage
+\section[ReLU 网络的表示与零梯度]{ReLU 网络的表示与零梯度\hfill\textcolor{gray}{[20 分]}}
+
+输入为 $x=(x_1,x_2)^\top\in\R^2$，目标是在以下四个点精确输出指定实数：
+\[
+f(0,0)=0,\quad f(1,0)=1,\quad f(0,1)=1,\quad f(1,1)=0.
+\]
+定义 $\relu(t)=\max\{0,t\}$，逐元素作用于向量。只要求这四个点上的函数值，不要求对其他输入满足某种标签规则。
+
+\partq{1}{6} 证明：不存在实数 $\alpha_1,\alpha_2,\beta$，使仿射函数 $g(x)=\alpha_1x_1+\alpha_2x_2+\beta$ 满足以上四个等式。
+
+\partq{2}{8} 构造一个含两个隐藏单元的网络，给出 $U,c,v,a$ 的一组具体取值，并核对四个函数值：
+\[
+f(x)=v^\top\relu(Ux+c)+a,\quad
+U\in\R^{2\times2},\quad c,v\in\R^2,\quad a\in\R.
+\]
+可直接使用恒等式 $\relu(t)+\relu(-t)=|t|$。
+
+\partq{3}{6} 考虑一个独立的一维回归问题，仅有一个样本 $x=1,y=1$，模型和损失为
+\[
+\widehat y=v\relu(wx+b),\qquad L=\frac12(\widehat y-y)^2,
+\qquad w,b,v\in\R.
+\]
+在参数 $w=0,b=-1,v=1$ 处，计算损失与全部三个参数的一阶导数；再给出一组损失更低的参数。
+
+\clearpage
+\section[参数缩放与训练过程]{参数缩放与训练过程\hfill\textcolor{gray}{[20 分]}}
+
+设输入 $x\in\R^d$，模型为
+\[
+f_{w,v}(x)=v\relu(w^\top x),\qquad
+w\in\R^d\setminus\{0\},\quad v\in\R\setminus\{0\}.
+\]
+其中 $d$ 为正整数，$\relu(t)=\max\{0,t\}$。可直接使用正齐次性质
+\[
+\relu(ct)=c\relu(t),\qquad c>0.
+\]
+对任意缩放因子 $c>0$，记 $w_c=cw$、$v_c=v/c$。向量范数为欧氏范数。
+
+\partq{1}{6} 证明缩放前后对任意输入的预测完全一致。固定 $\lambda>0$，写出缩放后参数的正则化项
+\[
+R(c)=\frac\lambda2\bigl(\|w_c\|_2^2+v_c^2\bigr),
+\]
+并给出一组 $w,v,c$ 的具体取值，使预测不变而正则化项发生变化。
+
+\partq{2}{8} 将 $w,v$ 视为固定，求使 $R(c)$ 最小的 $c>0$，并求最小值。需说明所求点是全局最小点。
+
+\partq{3}{6} 本小问不加正则化。给定样本 $(x_i,y_i)$，其中 $x_i\in\R^d$、$y_i\in\R$，$i=1,\ldots,n$，$n$ 为正整数，定义
+\[
+L(w,v)=\frac1{2n}\sum_{i=1}^n\bigl(f_{w,v}(x_i)-y_i\bigr)^2.
+\]
+假设全部 $w^\top x_i\ne0$。记 $G_w=\nabla_wL(w,v)$、$G_v=\partial L(w,v)/\partial v$。在缩放后的点，用同一学习率 $\eta>0$ 同时更新：
+\[
+w_c^+=w_c-\eta\nabla_{w_c}L(w_c,v_c),\qquad
+v_c^+=v_c-\eta\frac{\partial L(w_c,v_c)}{\partial v_c}.
+\]
+推导梯度随 $c$ 的变化关系，并用 $w,v,G_w,G_v,\eta,c$ 表示还原后的参数
+\[
+\widetilde w^+=w_c^+/c,\qquad \widetilde v^+=c v_c^+.
+\]
+最后写出 $c=2$ 时两个梯度项的有效学习率。
+
+\end{document}

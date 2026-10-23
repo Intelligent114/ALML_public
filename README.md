@@ -27,6 +27,7 @@ git pull
 | --- | --- | --- | --- |
 | 书面作业 | HW0 | 数学基础诊断 | [题目](HWs/HW0/hw0.pdf) · [公开版参考解答](HWs/HW0/hw0-solution.pdf) |
 | 书面作业 | HW1 | 线性模型、正则化与性能评估 | `HWs/HW1/hw1.pdf` |
+| 书面作业 | HW2 | 神经网络与反向传播 | [题目 PDF](HWs/HW2/hw2.pdf) · [TeX 源文件](HWs/HW2/hw2.tex) |
 | 实验 | LAB0 | Git、Conda、VS Code 与机器学习环境配置 | `LABs/LAB0/lab0.pdf`、`verify_env.py`、`environment.yml` |
 | 实验 | LAB1 | 线性回归、梯度下降、联合调参与性能评估 | `LABs/LAB1/lab1.pdf`、`README.md`、`src/`、`environment.yml` |
 | 实验 | LAB2 | 神经网络如何学习不同频率的信号 | [实验 PDF](LABs/LAB2/lab2.pdf) · [运行说明、代码与数据](LABs/LAB2/) |
@@ -46,10 +47,13 @@ ALML_public/
 |   |   |-- hw0.tex
 |   |   |-- hw0-solution.pdf
 |   |   `-- hw0-solution.tex
-|   `-- HW1/
-|       |-- hw1.pdf
-|       |-- hw1.tex
-|       `-- hw1.md
+|   |-- HW1/
+|   |   |-- hw1.pdf
+|   |   |-- hw1.tex
+|   |   `-- hw1.md
+|   `-- HW2/
+|       |-- hw2.pdf
+|       `-- hw2.tex
 |-- Tutorials/
 |   `-- TUT01/
 |       `-- vector_matrix_differentials.pdf
@@ -93,6 +97,12 @@ PDF 是正式发布版本；同时提供 TeX 源文件便于无障碍阅读、�
 - LAB1：将实验报告 `学号-姓名-LAB1.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)，将 `submission.py` 单独上传至 [课程 OJ](https://oj.temaurinum.moe)，不接收其他文件。OJ 负责代码 40 分与最终性能 10 分，报告占 50 分。
 - LAB1 须新建 `ai3002-lab1` 环境，具体任务与运行命令见 `LABs/LAB1/README.md` 和实验 PDF。
 - HW1 与 LAB1 的截止时间均为 **2026 年 10 月 19 日 06:00（北京时间）**；LAB1 的报告与代码须在此时间前分别提交。提交入口以课程通知为准。
+
+## HW2 提交
+
+HW2 为个人书面作业，主题是神经网络与反向传播，满分 100 分。共五道大题、15 个小问；题目见 [HW2 学生版 PDF](HWs/HW2/hw2.pdf)。
+
+截止时间为 **2026 年 11 月 23 日 06:00**。提交一个 PDF，命名为 `学号-姓名-HW2.pdf`，上传至 [Blackboard](https://bb.ustc.edu.cn)。按题号作答并保留必要步骤，文末说明 AI 使用情况并给出至少一项独立核验记录。
 
 ## LAB2 提交
 
