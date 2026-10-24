@@ -123,19 +123,32 @@ J=\frac1n\sum_{i=1}^n(\widehat y_i-y_i)^2+
 \begin{lstlisting}
 python src/run.py check
 \end{lstlisting}
-公开检查使用远离 ReLU 零点的小网络，对零和非零正则化分别比较：NumPy 解析梯度、PyTorch 自动微分、中心有限差分。对参数坐标 $u$，有限差分为
+公开检查使用远离 ReLU 零点的小网络，在相同参数与输入下，对零和非零正则化分别进行以下两组比较。记当前参数数组的 NumPy 解析梯度、PyTorch 自动微分梯度、中心有限差分梯度分别为 $g_{\rm np}$、$g_{\rm pt}$、$g_{\rm num}$。
+
+对单个参数坐标 $u$，保持其余参数不变，中心有限差分为
 \[
 g_{\rm num}(u)=\frac{J(u+\varepsilon)-J(u-\varepsilon)}{2\varepsilon},\qquad
 \varepsilon=10^{-6}.
 \]
-每个参数数组的归一化误差为
+\textbf{第一组：NumPy 解析梯度与中心有限差分。}每个参数数组的归一化误差须满足
 \[
-\frac{\max|g_{\rm num}-g_{\rm analytic}|}
-{\max\{1,\max|g_{\rm num}|,\max|g_{\rm analytic}|\}}.
+E_{\rm num,np}
+=\frac{\max|g_{\rm num}-g_{\rm np}|}
+{\max\{1,\max|g_{\rm num}|,\max|g_{\rm np}|\}}
+<10^{-6}.
 \]
-验收阈值为 $10^{-6}$。
+这里的最大值均遍历当前参数数组的全部元素。
 
-\textbf{报告要求：}列出两种正则化下六组参数的核验误差，说明为何检查点应避开 ReLU 零点；若修复过错误，给出一项错误、修正和核验记录。若首次通过，给出对批量平均或偏置惩罚的一项独立核验。
+\textbf{第二组：PyTorch 自动微分梯度与 NumPy 解析梯度。}脚本使用\code{np.allclose}逐元素检查，要求对每个元素索引 $i$ 都有
+\[
+|g_{{\rm pt},i}-g_{{\rm np},i}|
+\leq 10^{-10}+10^{-9}|g_{{\rm np},i}|.
+\]
+其中绝对容差为 $10^{-10}$，相对容差为 $10^{-9}$；权重梯度先转置为 NumPy 的布局再比较。
+
+\textbf{输出说明：}\code{check.json}中的\code{relative_errors}保存第一组的归一化误差。第二组通过断言检查，不单独保存误差数值；检查成功时\code{passed=true}表示两组均通过，第二组失败时会报\code{torch mismatch}。
+
+\textbf{报告要求：}列出两种正则化下六组参数的第一组归一化误差，并记录第二组是否通过；说明为何检查点应避开 ReLU 零点。若修复过错误，给出一项错误、修正和核验记录；若首次通过，给出对批量平均或偏置惩罚的一项独立核验。
 
 \section{任务二：观察频率学习过程（报告 12 分）}
 \begin{lstlisting}
