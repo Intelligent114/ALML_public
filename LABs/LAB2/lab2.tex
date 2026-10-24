@@ -28,9 +28,11 @@
 类别&分值&内容\\\midrule
 OJ 代码&40&Fourier 映射 8；NumPy 前向 6；损失与反向 14；PyTorch 网络与参数对应 6；PyTorch 目标 6\\
 OJ 最终性能&10&未公开信号实例上的统一重训与预测\\
-报告&50&核验与基准 8；频率分析 12；联合选参 14；反例 10；二维迁移 4；复现与独立核验 2\\
+报告&50&实现与三方核验 8；频率分析 12；联合选参 14；反例 10；二维迁移 4；复现与独立核验 2\\
 环境创建&0&独立环境与检查，不计分\\\bottomrule
 \end{tabular}\end{center}
+
+报告由下述六项任务组成，各项分值合计为 $8+12+14+10+4+2=50$ 分。
 
 \section{环境与文件（不计分）}
 新建\code{ai3002-lab2}环境，不复用 LAB0/LAB1 环境。若尚未安装 Conda，请先按 LAB0 安装 Miniforge。
@@ -183,7 +185,7 @@ python src/run.py transfer
 
 \textbf{报告要求：}放入原图、观测掩码、重建图、绝对误差图，报告未观测像素 MSE；用简短文字指出误差主要出现于平滑区域、边缘还是条纹，并说明一维最优配置为何不保证二维最优。
 
-\Needspace{8\baselineskip}\section{最终核验、输出与提交}
+\Needspace{8\baselineskip}\section{任务六：复现与独立核验（报告 2 分）}
 将\code{results/tune.json}中的\code{recommended_config}原样填入\code{submission.py}的\code{get_config()}，然后执行：
 \begin{lstlisting}
 python src/run.py final
@@ -199,7 +201,12 @@ stress&\code{stress.json}及对应预测图&稀疏含噪反例\\
 transfer&\code{transfer.json, transfer.png}&二维未观测像素误差与图像\\
 final&\code{final.json}&最终配置、重训一致性、实现摘要\\\bottomrule
 \end{longtable}
-这些文件仅本地留存。报告末尾记录软件版本、设备、完整命令、总用时与 AI 使用情况，并附一项独立核验；未使用 AI 也应给出自检。问题通过\href{https://github.com/Intelligent114/ALML_public/issues}{课程仓库 Issues}提出，注明 LAB2 和任务编号，不公开完整实现或个人信息。
+这些文件仅本地留存。\textbf{报告要求（共 2 分）：}
+\begin{itemize}
+\item \textbf{复现记录（1 分）：}在报告末尾记录软件版本、设备、完整运行命令、最终配置与总用时，使他人能按记录复现实验。
+\item \textbf{独立核验记录（1 分）：}说明 AI 使用情况，并给出一项可复核的自检过程与结果；未使用 AI 也应给出自检。可引用任务一已有的独立核验记录，无需额外增加实验。
+\end{itemize}
+问题通过\href{https://github.com/Intelligent114/ALML_public/issues}{课程仓库 Issues}提出，注明 LAB2 和任务编号，不公开完整实现或个人信息。
 
 \task{最终性能的简要规则}
 OJ 使用八个未公开的一维信号实例，按统一 CPU 协议重新训练；你的配置在全部实例固定。参考基准使用相同架构与预算，固定 $s=0.25$、$\eta=3\times10^{-3}$、$\lambda=0$。汇总全部未见位置的 RMSE；不劣于基准得 10 分，否则按基准 RMSE 与提交 RMSE 的比值折算。训练失败或非有限输出时性能项为零，代码分独立评测。二维任务只计报告分。

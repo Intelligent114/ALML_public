@@ -31,14 +31,17 @@ python src/run.py final
 
 ## 任务与产物
 
-| 阶段 | 工作 | 主要证据 |
-|---|---|---|
-| check | NumPy、PyTorch 与有限差分三方核验 | `check.json` |
-| observe | 原始坐标、近似参数量匹配、Fourier 表示三种对照 | `observe.json`、预测与频率曲线 |
-| tune | 六组基础比较及两组自主补选，只按验证集选择 | `trials.csv`、`tune.json` |
-| stress | 32 点含噪训练，中等尺度、高尺度及高尺度正则化 | `stress.json`、预测图 |
-| transfer | 一次二维图像重建，不重新调参 | `transfer.png`、`transfer.json` |
-| final | 配置与记录核对、固定预算重训 | `final.json` |
+| 阶段 | 工作 | 主要证据 | 报告分值 |
+|---|---|---|---:|
+| check | NumPy、PyTorch 与有限差分三方核验 | `check.json` | 8 |
+| observe | 原始坐标、近似参数量匹配、Fourier 表示三种对照 | `observe.json`、预测与频率曲线 | 12 |
+| tune | 六组基础比较及两组自主补选，只按验证集选择 | `trials.csv`、`tune.json` | 14 |
+| stress | 32 点含噪训练，中等尺度、高尺度及高尺度正则化 | `stress.json`、预测图 | 10 |
+| transfer | 一次二维图像重建，不重新调参 | `transfer.png`、`transfer.json` | 4 |
+| final | 配置与记录核对、固定预算重训、复现与独立核验记录 | `final.json`、报告中的复现与自检记录 | 2 |
+| **合计** | | | **50** |
+
+最后 2 分由复现记录 1 分、AI 使用说明及可复核自检 1 分组成；可引用任务一已有的独立核验，无需新增实验。
 
 数据和代码放在 `data/`、`src/`，输出放在 `results/`。不修改提供的数据、初始化、优化器、网络宽度或 800 次更新预算。除核验用 NumPy 小网络外，主实验由 PyTorch 自动微分训练。若修改计算实现，重新运行前面的各阶段；只改 `get_config()` 无需重做实现核验。
 
