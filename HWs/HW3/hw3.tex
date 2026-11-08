@@ -1,0 +1,346 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath,amssymb,bm,dsfont}
+\usepackage{geometry,fancyhdr,enumitem,needspace,xcolor,booktabs}
+\usepackage{xurl,hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+\geometry{left=2.15cm,right=2.15cm,top=2.05cm,bottom=2.05cm}
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.3em}
+\setlength{\emergencystretch}{2em}
+\setlist[itemize]{leftmargin=2em,itemsep=0.15em}
+\definecolor{courseblue}{HTML}{2457A6}
+\hypersetup{colorlinks=true,urlcolor=courseblue,linkcolor=courseblue,
+  pdftitle={HW3 无监督表示、分类几何与模型复杂度},pdfauthor={中国科学技术大学}}
+\newcommand{\R}{\mathbb R}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\col}{\operatorname{col}}
+\newcommand{\partq}[2]{\par\Needspace{6\baselineskip}\noindent\textbf{（#1）（#2 分）}}
+\newcommand{\answer}{\par\Needspace{5\baselineskip}\noindent\textcolor{courseblue}{\textbf{参考解答}}\par}
+\newcommand{\rubric}[1]{\par\noindent\textcolor{courseblue}{\textbf{评分标准：}}#1\par}
+\newcommand{\pitfall}[1]{\par\noindent\textcolor{courseblue}{\textbf{常见错误：}}#1\par}
+\newcommand{\studentbreak}{\clearpage}
+\pagestyle{fancy}\fancyhf{}
+\lhead{AI3002 人工智能与机器学习基础}
+\rhead{HW3：无监督表示与分类几何}\cfoot{\thepage}
+\raggedbottom
+\title{\vspace{-1cm}\textbf{人工智能与机器学习基础\\HW3：无监督表示、分类几何与模型复杂度}}
+\author{中国科学技术大学}
+\date{2026 年秋季学期\quad 学生版\\[0.3em]截止时间：2026 年 12 月 21 日 06:00}
+\begin{document}\maketitle\thispagestyle{fancy}
+
+个人完成，满分 100 分。共五道大题、19 个小问；各大题独立，符号与假设以本题为准。给出所要求的计算、推导或构造及必要核验。题内明确给出的公式和事实可直接使用。后续小问可引用题目要求证明的中间结论，即使未完成该结论的证明。
+
+允许使用 AI 辅助，但须在文末说明使用方式，并提供至少一项独立核验记录，例如核对维度、代入特例或用数值计算检验推导；未使用 AI 的同学同样给出一项自检。最终答案应能由本人独立解释。
+
+\section*{提交要求}
+按题号作答，保留必要步骤；提交一个 PDF，命名为\texttt{学号-姓名-HW3.pdf}，上传至 Blackboard（\href{https://bb.ustc.edu.cn}{bb.ustc.edu.cn}）。截止时间为 2026 年 12 月 21 日 06:00。如有疑问，请通过\href{https://github.com/Intelligent114/ALML_public/issues}{课程仓库 Issues}提问，注明 HW3 和题号，不要公开个人信息或完整答案。
+
+% TEACHER_POLICY
+
+\section[K-means 与 PCA]{K-means 与 PCA：离散划分和连续方向\hfill\textcolor{gray}{[20 分]}}
+设 $n\geq2$、$d\geq1$ 为整数，样本 $x_i\in\R^d$ 按行组成非零矩阵 $X\in\R^{n\times d}$，并已中心化：
+\[
+X=\begin{bmatrix}x_1^\top\\\vdots\\x_n^\top\end{bmatrix},
+\qquad \sum_{i=1}^n x_i=0.
+\]
+将样本下标划分为两个非空集合 $C_1,C_2$，记 $n_k=|C_k|$、$n_1+n_2=n$。簇中心 $\mu_1,\mu_2\in\R^d$，目标为
+\[
+J(C_1,C_2;\mu_1,\mu_2)
+=\sum_{k=1}^2\sum_{i\in C_k}\|x_i-\mu_k\|_2^2.
+\]
+$\|\cdot\|_2$ 为欧氏范数，$\|X\|_F^2=\sum_i\sum_j X_{ij}^2$；$\mathds{1}_n$ 为全 $1$ 列向量。记固定划分下对中心最小化后的目标为 $J_*(C_1,C_2)$。
+
+\partq{1}{6} 对固定的 $C_1,C_2$，推导最优簇中心 $\bar x_k$，并证明
+\[
+J_*(C_1,C_2)=\|X\|_F^2-n_1\|\bar x_1\|_2^2-n_2\|\bar x_2\|_2^2.
+\]
+% SOLUTION 1.1
+
+\partq{2}{5} 定义 $z\in\R^n$ 为
+\[
+z_i=\begin{cases}
+\sqrt{\dfrac{n_2}{n n_1}},&i\in C_1,\\[0.5em]
+-\sqrt{\dfrac{n_1}{n n_2}},&i\in C_2.
+\end{cases}
+\]
+验证 $z^\top z=1$、$z^\top\mathds{1}_n=0$，并证明
+\[
+J_*(C_1,C_2)=\|X\|_F^2-z^\top XX^\top z.
+\]
+% SOLUTION 1.2
+
+\partq{3}{5} 现在不再要求向量来自某个两簇划分，而允许选择任意满足单位长度和零和条件的 $v\in\R^n$。设 $\lambda_1>0$ 为 $X^\top X$ 的最大特征值，$u_1\in\R^d$ 是对应的一个单位特征向量。求
+\[
+B=\min_{\substack{v\in\R^n\\v^\top v=1,\ v^\top\mathds{1}_n=0}}
+\left(\|X\|_F^2-v^\top XX^\top v\right),
+\]
+并用第一主成分得分向量 $Xu_1$ 写出一个达到最小值的 $v$。证明 $B\leq J_*(C_1,C_2)$ 对任意两簇划分成立。
+
+可使用以下线性代数事实：实对称矩阵有正交归一的特征向量基；$XX^\top$ 与 $X^\top X$ 的非零特征值相同。注意：最大特征值不一定为单重。
+% SOLUTION 1.3
+
+\partq{4}{4} 取
+\[
+X=\begin{bmatrix}-2&0\\-1&0\\1&0\\2&0\end{bmatrix}.
+\]
+计算第（3）问的下界 $B$；给出一个具体两簇划分，计算其中心及 $J_*$；证明任何两簇划分都不能达到 $B$。无需枚举全部划分，也无需证明你给出的划分是全局最优划分。
+% SOLUTION 1.4
+
+\clearpage
+\section[EM 与 K-means]{EM 与 K-means：软分配、极限与退化\hfill\textcolor{gray}{[20 分]}}
+设样本为 $x_i\in\R^d$，$i=1,\ldots,n$，分量数为整数 $K\geq2$，$I_d$ 为单位矩阵。前三问使用等权、共同球形协方差的高斯混合模型：
+\[
+p_\sigma(x;\mu)=\frac1K\sum_{k=1}^K\mathcal N(x\mid\mu_k,\sigma^2I_d),
+\qquad \mu=(\mu_1,\ldots,\mu_K),\quad \mu_k\in\R^d,
+\]
+\[
+\mathcal N(x\mid\mu_k,\sigma^2I_d)
+=(2\pi\sigma^2)^{-d/2}
+\exp\!\left(-\frac{\|x-\mu_k\|_2^2}{2\sigma^2}\right),
+\qquad \ell_\sigma(\mu)=\sum_{i=1}^n\log p_\sigma(x_i;\mu).
+\]
+$\log$ 为自然对数。进行一次 EM 更新时，$\sigma>0$ 和混合权重固定，只更新均值。第（2）问中的极限，是在数据和中心均固定时比较不同的正数 $\sigma$，而非在一次 EM 迭代中更新方差。
+
+\partq{1}{6} 设隐变量 $h_i\in\{1,\ldots,K\}$ 表示第 $i$ 个样本所属分量，且 $P(h_i=k)=1/K$。用贝叶斯公式推导责任度
+\[
+r_{ik}=P(h_i=k\mid x_i;\mu).
+\]
+固定 E 步得到的 $r_{ik}$，从以下 M 步目标出发，求每个更新后的均值 $\mu_k^+$：
+\[
+Q(\widetilde\mu;r)
+=\sum_{i=1}^n\sum_{k=1}^K
+r_{ik}\log\!\left[\frac1K\mathcal N(x_i\mid\widetilde\mu_k,\sigma^2I_d)\right].
+\]
+写出求导步骤，并说明本题有限参数、正方差条件下更新式的分母为何为正。
+% SOLUTION 2.1
+
+\partq{2}{6} 固定所有中心，记
+\[
+d_{ik}=\|x_i-\mu_k\|_2^2,\qquad
+m_i=\min_k d_{ik},\qquad
+T_i=\{k:d_{ik}=m_i\}.
+\]
+分别求 $|T_i|=1$ 和 $|T_i|>1$ 时 $r_{ik}$ 在 $\sigma\to0^+$ 时的极限。再定义
+\[
+D_\sigma(\mu)
+=-2\sigma^2\sum_{i=1}^n
+\log\!\left(\sum_{k=1}^K\exp\!\left[-\frac{d_{ik}}{2\sigma^2}\right]\right).
+\]
+它与 $-2\sigma^2\ell_\sigma(\mu)$ 仅相差一个与中心无关的常数。通过对括号内的指数和作上下界估计，证明
+\[
+\sum_{i=1}^n m_i-2n\sigma^2\log K
+\ \leq\ D_\sigma(\mu)\ \leq\ \sum_{i=1}^n m_i,
+\]
+并求其极限。
+% SOLUTION 2.2
+
+\studentbreak
+\partq{3}{4} 对每个 $i$，取 $r_{ik}>0$ 且 $\sum_k r_{ik}=1$，定义
+\[
+F(r,\mu)=\sum_{i=1}^n\sum_{k=1}^K
+r_{ik}\log\frac{\frac1K\mathcal N(x_i\mid\mu_k,\sigma^2I_d)}{r_{ik}}.
+\]
+可直接使用对数的 Jensen 不等式：若 $a_k>0$、$r_k>0$ 且 $\sum_k r_k=1$，则
+\[
+\log\!\left(\sum_k r_k a_k\right)\geq\sum_k r_k\log a_k,
+\]
+且所有 $a_k$ 相等时取等号。令 $r^{(t)}$ 是参数 $\mu^{(t)}$ 下的精确责任度，$\mu^{(t+1)}$ 是对应的精确 M 步更新。证明 $\ell_\sigma(\mu)\geq F(r,\mu)$，核验当前点的等号，并写出证明
+\[
+\ell_\sigma(\mu^{(t+1)})\geq\ell_\sigma(\mu^{(t)})
+\]
+的完整不等式链。
+% SOLUTION 2.3
+
+\partq{4}{4} 本小问改用两个一维高斯分量，方差不再固定或共享。给定任意有限的互异实数 $t_1,\ldots,t_m$，其中整数 $m\geq2$，考虑
+\[
+p(t;\theta)=\frac12\mathcal N(t\mid a_1,v_1)
++\frac12\mathcal N(t\mid a_2,v_2),
+\qquad \theta=(a_1,a_2,v_1,v_2),\quad v_1,v_2>0.
+\]
+这里第二个高斯参数 $v_j$ 表示\textbf{方差}，一维密度为
+\[
+\mathcal N(t\mid a,v)=(2\pi v)^{-1/2}
+\exp\!\left(-\frac{(t-a)^2}{2v}\right).
+\]
+构造一族参数 $\theta(\varepsilon)$，使一个分量向 $t_1$ 收缩、另一个分量保持固定的正方差，并证明
+\[
+\sum_{i=1}^m\log p(t_i;\theta(\varepsilon))\longrightarrow+\infty
+\qquad(\varepsilon\to0^+).
+\]
+证明须同时控制 $t_1$ 处和其余观测点处的对数密度。
+% SOLUTION 2.4
+
+\clearpage
+\section[自编码器与 NMF]{自编码器与 NMF：重构与表示的差别\hfill\textcolor{gray}{[18 分]}}
+本题三个小问分别给出数据与假设，相互独立。$\|M\|_F^2$ 表示矩阵 $M$ 的全部元素平方和，$\|u\|_2$ 为向量的欧氏范数。
+
+\partq{1}{6} 设数据矩阵 $X\in\R^{n\times d}$ 的每一行为一个样本，列均值为零，且 $S=X^\top X$ 正定。取编码向量 $a\in\R^d$ 和解码向量 $b\in\R^d$，考虑
+\[
+\widehat X=Xab^\top,\qquad
+L(a,b)=\|X-Xab^\top\|_F^2,\qquad \|b\|_2=1.
+\]
+固定 $b$ 时，展开目标并求最优 $a$；随后求一个最优 $b$ 和最小重构误差，用 $S$ 的最大特征值及对应单位特征向量表示结果。正定指对所有非零 $u\in\R^d$ 都有 $u^\top Su>0$；注意：最大特征值不一定为单重。
+% SOLUTION 3.1
+
+\partq{2}{6} 设 $X\in\R^{n\times d}$，编码器矩阵 $E\in\R^{d\times r}$、解码器矩阵 $D\in\R^{r\times d}$，其中 $1\leq r<d$，编码与重构分别为
+\[
+Z=XE,\qquad \widehat X=Z D.
+\]
+对任意可逆矩阵 $A\in\R^{r\times r}$，定义
+\[
+E'=EA,\qquad D'=A^{-1}D.
+\]
+证明变换后的重构与原重构相同，并写出编码中两点的欧氏距离在变换后的表达式。
+
+再考虑 $n=3,r=2$ 时的三个编码点（按行给出）：
+\[
+Z=\begin{bmatrix}
+-2/3&-1/3\\
+4/3&-1/3\\
+-2/3&2/3
+\end{bmatrix}.
+\]
+构造一个正对角矩阵 $A=\diag(s_1,s_2)$，其中 $s_1,s_2>0$，使 $Z$ 与 $ZA$ 的\textbf{最优两簇 K-means 划分不同}；两簇均非空。核验两种表示下的最优划分，允许用三对距离的比较代替列举所有中心。
+% SOLUTION 3.2
+
+\partq{3}{6} 对非负矩阵分解，定义
+\[
+L(W,H)=\|V-WH\|_F^2,\qquad W,H\text{ 的所有元素均非负}.
+\]
+固定 $H$，考虑乘法更新
+\[
+W^+=W\odot\frac{VH^\top}{WHH^\top},
+\]
+其中 $\odot$ 和分式分别表示逐元素乘法和逐元素除法。给定
+\[
+V=\begin{bmatrix}2&1\\1&2\end{bmatrix},\qquad
+W=\begin{bmatrix}1&0\\1&1\end{bmatrix},\qquad
+H=\begin{bmatrix}1&1\\1&2\end{bmatrix}.
+\]
+计算 $W_{12}^+$ 以及更新前的 $\partial L/\partial W_{12}$。然后仅把原矩阵的 $W_{12}$ 改为 $\delta>0$，其他元素和 $H$ 全部不变，求使损失严格下降的全部 $\delta$。
+% SOLUTION 3.3
+
+\clearpage
+\section[PCA、核映射与 SVM]{PCA、核映射与 SVM：表示如何改变分类\hfill\textcolor{gray}{[24 分]}}
+设训练样本为 $(x_i,y_i)$，$x_i\in\R^d$、$y_i\in\{-1,+1\}$，$i=1,\ldots,n$，两类均有样本。带截距的硬间隔 SVM 为
+\[
+\min_{w\in\R^d,\ b\in\R}\frac12\|w\|_2^2
+\quad\text{满足}\quad
+y_i(w^\top x_i+b)\geq1\quad(i=1,\ldots,n).
+\]
+截距 $b$ 不受惩罚。对非零 $w$，本题的几何间隔统一指最近训练点到分离超平面的距离；在规范化的最优解处为
+\[
+\gamma=\frac1{\|w\|_2}.
+\]
+各小问均重新给出所需表示。
+
+\partq{1}{6} 设 $1\leq r\leq d$，$U\in\R^{d\times r}$ 满足 $U^\top U=I_r$，表示为 $z_i=U^\top x_i$。证明在 $z_i$ 上训练权重 $\beta\in\R^r$、截距 $b$ 的硬间隔 SVM，等价于
+\[
+\min_{\substack{w\in\col(U)\\b\in\R}}\frac12\|w\|_2^2
+\quad\text{满足}\quad y_i(w^\top x_i+b)\geq1.
+\]
+这里 $\col(U)=\{U\beta:\beta\in\R^r\}$。写出两个问题的双向参数对应，核对预测、约束和目标值。等价性也应涵盖投影后不可分、两个问题均无可行解的情形。
+% SOLUTION 4.1
+
+\partq{2}{6} 四个等权样本为
+\[
+\begin{array}{c|rrrr}
+i&1&2&3&4\\\hline
+x_i^\top&(10,1)&(-10,1)&(10,-1)&(-10,-1)\\
+y_i&+1&+1&-1&-1
+\end{array}
+\]
+用 $S=\frac14\sum_{i=1}^4 x_i x_i^\top$ 计算第一主成分方向和保留的方差比例。仅保留该一维投影后，证明任意确定性分类函数 $g:\R\to\{-1,+1\}$ 在这四点上的错误率至少为 $1/2$。再求原二维空间的最优 $w,b,\gamma$，并证明其最优性。
+% SOLUTION 4.2
+
+\studentbreak
+\partq{3}{6} 设原始训练集线性可分，$A\in\R^{d\times d}$ 可逆，表示为 $z=A^\top x$。在表示空间中使用权重 $\beta\in\R^d$ 和截距 $b$，令原空间权重为 $w=A\beta$。将目标 $\frac12\|\beta\|_2^2$ 改写为 $w$ 的二次型，并求内积核
+\[
+k_A(x,x')=(A^\top x)^\top(A^\top x').
+\]
+分别将结果用于以下两种 $A$：
+\[
+\text{（i）}\ A^\top A=AA^\top=I_d;
+\qquad
+\text{（ii）}\ A=S^{-1/2},\quad S\text{ 为正定协方差矩阵}.
+\]
+第二种情形中，若
+\[
+S=Q\diag(\lambda_1,\ldots,\lambda_d)Q^\top,
+\quad Q^\top Q=I_d,\quad\lambda_j>0,
+\]
+则定义
+\[
+S^{-1/2}=Q\diag(\lambda_1^{-1/2},\ldots,\lambda_d^{-1/2})Q^\top.
+\]
+对两种情形均写出原空间目标和核。
+% SOLUTION 4.3
+
+\partq{4}{6} 设特征映射 $\phi:\R^d\to\R^q$，其中 $q$ 为正整数，对应核为
+\[
+k(x,x')=\phi(x)^\top\phi(x').
+\]
+假设训练集在该特征空间中线性可分，硬间隔 SVM 的一个最优解为 $(v_*,b_*)$，其中 $v_*\in\R^q$。对常数 $c>0$，令
+\[
+k_c(x,x')=c\,k(x,x'),\qquad \phi_c(x)=\sqrt c\,\phi(x).
+\]
+构造新问题的一个最优解 $(v_{c,*},b_{c,*})$，并通过双向可行解对应证明最优性。求新旧预测分数、最优目标值与几何间隔的关系；利用这些关系构造预测完全相同、但数值间隔严格变大的例子。
+% SOLUTION 4.4
+
+\clearpage
+\section[决策树与线性分类]{决策树与线性分类：坐标和复杂度\hfill\textcolor{gray}{[18 分]}}
+给定六个等权的二维样本，$i=1,2,3$：
+\[
+p_i=(i,i+1/4)^\top,\quad y(p_i)=+1;
+\qquad q_i=(i,i-1/4)^\top,\quad y(q_i)=-1.
+\]
+允许的决策树为二叉、轴对齐阈值树：每个内部节点选择一个坐标 $j\in\{1,2\}$ 和阈值 $t$，按 $x_j\leq t$ 与 $x_j>t$ 分支；每个叶节点输出固定的 $+1$ 或 $-1$。叶节点使用多数类，同票时任选一类。训练错误率为六个样本中误分类的比例。一个内部节点、两个叶节点的树称为树桩。
+
+\begin{center}
+\begin{tikzpicture}[x=1.25cm,y=1.05cm,>=Stealth,font=\small]
+  \draw[->] (0,0) -- (3.65,0) node[right] {$x_1$};
+  \draw[->] (0,0) -- (0,3.65) node[above] {$x_2$};
+  \foreach \i in {1,2,3}{
+    \draw (\i,.04)--(\i,-.04) node[below] {$\i$};
+    \draw (.04,\i)--(-.04,\i) node[left] {$\i$};
+    \draw[fill=white,line width=.7pt] (\i,{\i+.25}) circle (2.3pt);
+    \node[above left=1pt] at (\i,{\i+.25}) {$p_{\i}$};
+    \fill (\i,{\i-.25}) circle (2.3pt);
+    \node[below right=1pt] at (\i,{\i-.25}) {$q_{\i}$};
+  }
+  \node[anchor=west,align=left] at (4,.95) {空心点：类别 $+1$\\实心点：类别 $-1$};
+\end{tikzpicture}
+\end{center}
+
+\partq{1}{4} 对每个坐标，仅考查相邻不同特征值的中点作为候选阈值，且两个分支均非空。求最优树桩的训练错误率，给出一个达到最优值的坐标、阈值及叶节点预测。说明不存在错误率更低的候选树桩；可以用简表或对有序标签的分析。
+% SOLUTION 5.1
+
+\partq{2}{6} 证明任意零训练误差的上述决策树至少需要六个非空叶节点，并给出一棵达到该下界的树。可使用：同一叶节点的区域是两个坐标区间的笛卡尔积，即一个轴对齐矩形（区间可以无界）。可以用按顺序判断阈值的规则描述树，不强制画树图。
+% SOLUTION 5.2
+
+\partq{3}{4} 改用旋转后的坐标
+\[
+z=R x,\qquad
+R=\frac1{\sqrt2}\begin{bmatrix}1&1\\-1&1\end{bmatrix}.
+\]
+计算六个样本的 $z_2$，构造一个零训练误差的树桩，写出原坐标中与它对应的线性分类函数。只需保证六个样本上正确，分类边界上的输出可任意规定。
+% SOLUTION 5.3
+
+\partq{4}{4} 回到原坐标，仅比较以下三棵候选树：
+\begin{itemize}
+\item $T_1$：只有一个叶节点，在全部样本中输出多数类；
+\item $T_2$：在根节点按 $x_2\leq1$ 分裂，左叶输出 $-1$，右叶输出 $+1$；
+\item $T_6$：按 $x_2$ 从小到大的顺序，依次使用阈值 $1,3/2,2,5/2,3$，每次将最小的剩余样本分离到左叶；最终六个叶节点各含一个样本，输出该样本的标签。
+\end{itemize}
+令 $L(T)$ 为叶节点数，$\alpha\geq0$，代价为
+\[
+C_\alpha(T)=\operatorname{Error}(T)+\alpha L(T).
+\]
+写出三个代价函数，求所有 $\alpha\geq0$ 下的最优候选树。代价相等时选择叶节点更少的树，须明确分界点属于哪个区间。
+% SOLUTION 5.4
+
+\end{document}

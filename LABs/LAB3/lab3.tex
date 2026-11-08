@@ -1,0 +1,136 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[UTF8]{ctex}
+\usepackage{amsmath,amssymb,dsfont,booktabs,array,geometry,fancyhdr,enumitem,xcolor,listings,graphicx,xurl,hyperref}
+\geometry{left=2.15cm,right=2.15cm,top=2.15cm,bottom=2.05cm}
+\definecolor{bluecourse}{HTML}{174C78}
+\graphicspath{{./}{instructor/}}
+\hypersetup{colorlinks=true,urlcolor=bluecourse,linkcolor=bluecourse}
+\setlength{\headheight}{15pt}\setlength{\parskip}{.38em}\setlength{\emergencystretch}{2em}
+\setlist{leftmargin=2em,itemsep=.3em,topsep=.35em}
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,keepspaces=true,breaklines=true,showstringspaces=false,
+frame=single,backgroundcolor=\color{black!3},rulecolor=\color{black!18},aboveskip=.8em,belowskip=.7em,xleftmargin=.3em,xrightmargin=.3em}
+\newcommand{\code}[1]{\texttt{\small\detokenize{#1}}}
+\newcommand{\task}[1]{\par\smallskip\noindent\textbf{#1}\par}
+\pagestyle{fancy}\fancyhf{}\lhead{AI3002 人工智能与机器学习基础}\rhead{LAB3：跨设备识别}\cfoot{\thepage}
+\title{\vspace{-1cm}\textbf{LAB3：少量标签能否跨设备识别？}}
+\author{中国科学技术大学}
+\date{2026 年秋季学期\quad \ifdefined\Teacher 教师审阅版\else 学生版\fi\\截止时间：2026 年 12 月 21 日 06:00}
+\begin{document}\maketitle\thispagestyle{fancy}
+
+两台设备测量同一批物体时，读数会随设备而变。你的任务是利用少量类别标签和同一物体的成对观测，训练一个能在新设备上识别物体的分类器。你需要回答两个问题：哪些变化来自设备？排除部分设备变化以后，一个类别能否用一个中心描述？
+
+\task{提交与评分}
+个人完成。将报告 \code{学号-姓名-LAB3.pdf} 上传至 \href{https://bb.ustc.edu.cn}{Blackboard}，将单个 \code{submission.py} 上传至 \href{https://oj.temaurinum.moe}{OJ}。只接收这两项材料。建议报告 $6$--$8$ 页。允许 AI 辅助；注明用途，并给出一次本人能解释的独立核验。
+\begin{center}\begin{tabular}{lrp{9.6cm}}\toprule
+评分项&分值&依据\\\midrule
+OJ 代码&$30$&PCA $8$，K-means 单步更新 $8$，簇到类别映射 $8$，端到端接口 $6$。\\
+OJ 性能&$20$&六个设备与形态条件的平均召回率和最弱组召回率各占 $10$ 分。\\
+报告&$50$&实现核验 $8$，基准诊断 $12$，交叉对照 $14$，打乱配对 $12$，复现 $4$。\\\bottomrule
+\end{tabular}\end{center}
+\task{环境创建（不计分）}
+按 LAB0 安装 Miniforge，进入实际保存的 LAB3 根目录。若使用 LAB0 的示例路径，Windows PowerShell 与 macOS Terminal 分别执行下列第一行或第二行。
+\begin{lstlisting}
+cd $HOME\ALML_public\LABs\LAB3
+cd ~/ALML_public/LABs/LAB3
+\end{lstlisting}
+在同一个终端执行以下命令，创建独立环境。每次重新打开终端后先激活环境。
+\begin{lstlisting}
+conda env create -f environment.yml
+conda activate ai3002-lab3
+python src/run.py env
+\end{lstlisting}
+检查 \code{results/env.json} 中的解释器路径和版本。只编辑 \code{src/submission.py}；框架在 \code{src/}，公开数据在 \code{data/}，各阶段的记录和图保存在 \code{results/}。
+
+\newpage
+\section*{数据与评估协议}
+每个实例有 $3$ 个类别、$64$ 个连续特征。源设备各测量 $600$ 个物体，其中 $150$ 个物体由两台设备各测量一次。每台设备每类只给出 $6$ 个标签，共 $36$ 条有标签记录。成对观测均无标签。评估物体与训练物体分开生成。
+\begin{center}\begin{tabular}{lp{10.7cm}}\toprule
+公开文件中的数组&读取方式与用途\\\midrule
+\code{X}, \code{y}&形状分别为 $(1200,64)$ 和 $(1200,)$。类别编码为 $0,1,2$，未知标签记为 $-1$。前后各 $600$ 行来自两台源设备。\\
+\code{pairs}&形状为 $(150,2)$。每行是 \code{X} 中同一物体的两个行号，按源设备顺序排列。\\
+\code{tests}, \code{truth}&公开验证观测与标签，形状为 $(3,240,64)$ 和 $(3,240)$。每组每类 $80$ 个物体。仅由运行器用于评估、选参及画图。\\\bottomrule
+\end{tabular}\end{center}
+公开分为三个实例编号，每个编号有两份独立数据。\code{single} 中每个类别有一种主要形态，\code{double} 中同一类可以有两种相距较远的形态。每份数据包含三个验证条件：\code{same} 保持源设备中干扰与类别的相关方向，\code{neutral} 消除该相关，\code{reverse} 反转其方向。实例之间的观测坐标系也会改变。
+
+\task{允许使用的信息}
+每个实例独立拟合。表示学习可访问该实例 \code{X}、\code{pairs}；类别赋值可使用已知训练标签。最终设置对所有实例固定。公开验证只用于比较方案，不得用验证观测拟合表示或聚类中心。不得按文件名、形态标识、实例序号或评估设备切换配置。OJ 使用新的物体和坐标系，隐藏观测由私有评分器逐点应用模型；提交内容须为通用 NumPy 计算，不得读取文件、使用外部数据或预训练参数。
+
+\task{模型怎样预测}
+令 $x\in\mathbb R^d$ 为一个样本，训练得到均值 $\mu\in\mathbb R^d$、映射矩阵 $P\in\mathbb R^{d\times r}$、表示空间的中心 $c_j\in\mathbb R^r$ 及其类别 $\ell_j$。框架按下式预测；距离并列时取中心行号最小者：
+\[
+ z=P^\top(x-\mu),\qquad j^*(x)=\arg\min_j\|z-c_j\|_2^2,
+ \qquad \widehat y(x)=\ell_{j^*(x)} .
+\]
+单中心分类器对每类已标注的训练表示取平均。多簇分类器对全部训练表示运行 K-means，再用少量标签给簇赋类。两种分类器均可预测新物体。
+
+\newpage
+\section*{任务一\quad 实现与小例核验（报告 $8$ 分）}
+在 \code{submission.py} 中完成以下函数。允许 \code{numpy.linalg.svd} 和特征值分解；PCA、Lloyd 更新和簇标注需使用 NumPy 编写。所有行号从 $0$ 开始。
+\begin{enumerate}
+\item \code{fit_pca(X, retain)} 返回训练均值和按方差降序排列的正交主轴。取覆盖指定比例的最小维数 $r$。若中心化后奇异值是 $s_1\geq\dots\geq s_m$，判据为
+\[
+ \sum_{j=1}^{r}s_j^2\ \geq\ \texttt{retain}\sum_{j=1}^{m}s_j^2 .
+\]
+输入总方差为正，$0<\texttt{retain}\leq1$。新样本必须沿用训练均值与主轴。主轴符号可以改变。
+\item \code{lloyd_step(X, centers)} 返回每行分配给\textbf{旧}中心的整数下标，以及更新后的中心矩阵。距离并列取较小中心下标；没有分到任何训练点的中心保留原位置。
+\item \code{label_clusters(X, centers, y)} 返回每个中心的类别。按上述距离分配已知标签，簇内多数票决定类别；票数相等取较小类号。如果簇中无已知标签，取离该中心最近的已标注训练样本的类别；该距离并列取训练行号较小者。
+\item \code{get_config()} 返回字典，\code{clusters} 为 $2$ 至 $18$ 间的整数，\code{representation} 为容纳表示参数的 JSON 字典。\code{learn_representation(X, pairs, settings)} 返回 $(\mu,P)$，形状为 $(64,)$ 和 $(64,r)$，其中 $1\leq r\leq64$。该映射可随训练样本估计，参数选择规则必须固定。
+\end{enumerate}
+\begin{lstlisting}
+python src/run.py check
+\end{lstlisting}
+\task{报告证据}
+用下面的二选一算例手算，再与 \code{check.json} 逐项核对。若选择 PCA，写出均值与投影矩阵 $PP^\top$；若选择 Lloyd，写出旧分配和新中心。
+\[
+ X_{\rm PCA}=\begin{bmatrix}3&2\\1&2\\2&2\end{bmatrix},\quad
+ \texttt{retain}=0.9;\qquad
+ X_{\rm Lloyd}=(0,2,8,10)^\top,\quad C=(0,8,30)^\top .
+\]
+再用 Lloyd 算例及标签 $(2,-1,0,-1)^\top$，将中心行按 $(2,0,1)$ 重排。记录重排前后的簇类别，并说明在该例中同一物体的预测是否改变。可引用空簇的新位置或无标注簇的类别，展示一次边界检查。
+
+\newpage
+\section*{任务二\quad 普通基准在什么条件下失效？（报告 $12$ 分）}
+\begin{lstlisting}
+python src/run.py baseline
+\end{lstlisting}
+比较原始特征和保留 $90\%$ 方差的 PCA 表示，二者均使用相同的最近类中心分类器。\code{baseline.json} 给出保留维数、逐实例混淆矩阵及六组指标；\code{baseline.png} 汇总六组，\code{confusion.png} 展示第一个双形态实例。混淆矩阵的行是真实类别，列是预测类别。
+
+报告中列出两种方法的六组召回率。选一个实例，对照同向和反向设备下的混淆矩阵，指出至少一个具体类别由哪些正确预测转成了哪些误判。根据保留维数和分类误差，判断高解释方差在本实验中能否保证识别所需的信息。
+
+\section*{任务三\quad 表示和分类器各自解决了什么？（报告 $14$ 分）}
+先提出一条能用训练数据检验的假设，例如“同一物体的两次读数有哪些方向变化最大”。写出你如何使用配对索引构造表示，以及如何在公开验证集上选择表示参数、簇数。冻结候选后执行：
+\begin{lstlisting}
+python src/run.py compare
+\end{lstlisting}
+框架交叉组合原始／改进表示和单中心／多簇分类器，输出 \code{compare.json}、\code{compare.png}。除表中对应因素外，各方法共享样本、已知标签和随机种子。多簇拟合使用 K-means++ 初始化，独立启动 $5$ 次，每次至多 $60$ 次更新，按训练簇内平方和最小选取结果。最终提交采用“改进表示＋多簇分类”。在报告中保留至少两组实际比较过的设置及其公开成绩，说明为何冻结当前设置。不同设置的运行记录可用 \code{--out} 分开保存。
+
+\task{报告证据}
+用一张四行六列的表呈现最终设置的对照。固定分类器，比较表示；再固定表示，比较分类器。至少给出两处逐组的百分点差，并说明结论是否同时适用于两种形态。即使改进方法输给基准，控制变量清楚且证据支持解释，仍可取得相应分析分。
+
+\newpage
+\section*{任务四\quad 打乱配对能否推翻自己的解释？（报告 $12$ 分）}
+先记录事前预测：如果改进来自同一物体的正确配对，破坏配对后，哪一组性能最可能下降？若没有下降，什么原因也能解释先前结果？
+\begin{lstlisting}
+python src/run.py stress
+\end{lstlisting}
+脚本通过固定置换更换每个左端点的右侧伙伴，每个原配对均被破坏，且两侧记录各自的边际分布不变。正确配对与打乱配对分别重新拟合，训练观测、标签、学习算法、超参数和初始化种子固定。输出 \code{stress.json}、\code{stress.png}。报告列出两种形态和三种设备上的结果，量化性能的变化，并回到事前预测解释一处支持或削弱它的观测。若结果与预测相反，说明哪项假设值得重查。
+
+\section*{任务五\quad 冻结与复现（报告 $4$ 分）}
+\begin{lstlisting}
+python src/run.py final
+\end{lstlisting}
+在同一输出目录先运行最终代码的 \code{compare}。脚本核对源文件摘要、配置，重新拟合并验证六组结果与记录一致，写入 \code{final.json}。报告末尾给出配置、选择时的取舍、软件版本、运行命令、总时间、AI 使用情况及一项可复核自检。任务一的手算可直接作为自检。
+
+\task{最终性能如何算分}
+每个隐藏实例、每种设备条件先求三类召回率的平均值。对同一形态和设备条件的实例等权平均，得到六组分数 $a_g$。令 $A$ 为这六组的算术平均，$W$ 为最小值。隐藏评估共 $12$ 个种子，每个种子各生成一份单形态和双形态数据。性能分计算为
+\[
+ h(x;t)=\min\!\left(1,\max\!\left(0,\frac{x-1/3}{t-1/3}\right)\right),
+ \qquad S=10h(A;0.945)+10h(W;0.925).
+\]
+当六组平均召回率 $A\geq94.5\%$ 且最弱组召回率 $W\geq92.5\%$ 时，性能项得满 $20$ 分。例如，若 $A=96\%$、$W=90\%$，两项分别得 $10$ 分和约 $9.58$ 分，合计约 $19.58$ 分。评分使用未舍入的召回率。训练失败、模型形状不合规或产生非有限值时性能项记零。代码四项按各项通过的检查组比例独立计分。
+
+\ifdefined\Teacher
+  \clearpage
+  \IfFileExists{answers.tex}{\input{answers.tex}}{\input{instructor/answers.tex}}
+\fi
+\end{document}

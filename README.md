@@ -28,9 +28,11 @@ git pull
 | 书面作业 | HW0 | 数学基础诊断 | [题目](HWs/HW0/hw0.pdf) · [公开版参考解答](HWs/HW0/hw0-solution.pdf) |
 | 书面作业 | HW1 | 线性模型、正则化与性能评估 | `HWs/HW1/hw1.pdf` |
 | 书面作业 | HW2 | 神经网络与反向传播 | [题目 PDF](HWs/HW2/hw2.pdf) · [TeX 源文件](HWs/HW2/hw2.tex) |
+| 书面作业 | HW3 | 无监督表示、分类几何与模型复杂度 | [题目 PDF](HWs/HW3/hw3.pdf) · [TeX 源文件](HWs/HW3/hw3.tex) |
 | 实验 | LAB0 | Git、Conda、VS Code 与机器学习环境配置 | `LABs/LAB0/lab0.pdf`、`verify_env.py`、`environment.yml` |
 | 实验 | LAB1 | 线性回归、梯度下降、联合调参与性能评估 | `LABs/LAB1/lab1.pdf`、`README.md`、`src/`、`environment.yml` |
 | 实验 | LAB2 | 神经网络如何学习不同频率的信号 | [实验 PDF](LABs/LAB2/lab2.pdf) · [运行说明、代码与数据](LABs/LAB2/) |
+| 实验 | LAB3 | 少量标签能否跨设备识别？ | [实验 PDF](LABs/LAB3/lab3.pdf) · [运行说明、代码与数据](LABs/LAB3/) |
 | 习题课 | TUT01 | 向量与矩阵的微分 | [讲义 PDF](Tutorials/TUT01/vector_matrix_differentials.pdf) |
 
 第一次习题课时间为 **2026 年 9 月 25 日（周五）20:00（北京时间）**。安排见[课程网站习题课栏目](https://aiml.temaurinum.moe/tutorials/)。
@@ -51,9 +53,12 @@ ALML_public/
 |   |   |-- hw1.pdf
 |   |   |-- hw1.tex
 |   |   `-- hw1.md
-|   `-- HW2/
-|       |-- hw2.pdf
-|       `-- hw2.tex
+|   |-- HW2/
+|   |   |-- hw2.pdf
+|   |   `-- hw2.tex
+|   `-- HW3/
+|       |-- hw3.pdf
+|       `-- hw3.tex
 |-- Tutorials/
 |   `-- TUT01/
 |       `-- vector_matrix_differentials.pdf
@@ -72,12 +77,19 @@ ALML_public/
     |   |-- requirements.txt
     |   |-- src/
     |   `-- data/dev.csv
-    `-- LAB2/
-        |-- lab2.pdf
-        |-- lab2.tex
+    |-- LAB2/
+    |   |-- lab2.pdf
+    |   |-- lab2.tex
+    |   |-- README.md
+    |   |-- environment.yml
+    |   |-- requirements.txt
+    |   |-- src/
+    |   `-- data/
+    `-- LAB3/
+        |-- lab3.pdf
+        |-- lab3.tex
         |-- README.md
         |-- environment.yml
-        |-- requirements.txt
         |-- src/
         `-- data/
 ```
@@ -111,6 +123,13 @@ LAB2 为个人实验，主题是神经网络如何学习不同频率的信号。
 - 使用 `LABs/LAB2/environment.yml` 新建 `ai3002-lab2` 环境，CPU 即可；只修改 `src/submission.py`。完整任务和命令见 [LAB2 实验 PDF](LABs/LAB2/lab2.pdf) 与 [运行说明](LABs/LAB2/README.md)。
 - 实验报告 `学号-姓名-LAB2.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)，占 50 分。
 - 单个 `submission.py` 上传至 [OJ 的 LAB2](https://oj.temaurinum.moe/labs/lab2-frequency-learning/)，代码占 40 分，最终性能占 10 分。不接收其他文件。
+
+## HW3 与 LAB3 提交
+
+截止时间均为 **2026 年 12 月 21 日 06:00**。
+
+- HW3：将 `学号-姓名-HW3.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)。
+- LAB3：将报告 `学号-姓名-LAB3.pdf` 上传至 [Blackboard](https://bb.ustc.edu.cn)，占 50 分。将单个 `submission.py` 提交至 [OJ 的 LAB3](https://oj.temaurinum.moe/labs/lab3-cross-device-recognition/)，代码占 30 分，跨设备性能占 20 分。
 
 ## 通过 GitHub Issues 提问
 
